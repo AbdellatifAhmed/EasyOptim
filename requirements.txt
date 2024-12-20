@@ -3,5 +3,4 @@ numpy
 openpyxl
 pandas
 streamlit
-geodesic
 geopy
