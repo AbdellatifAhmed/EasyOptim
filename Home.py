@@ -2,24 +2,59 @@ import streamlit as st
 import pandas as pd
 import tools as lataftaf
 import pydeck as pdk
+import base64
+import os
 
+lataftaf.get_log()
 st.set_page_config(
     page_title="EasyOptim",
     layout="wide"  # Use the full width of the page
 )
-st.write("Hello Nokia Optimization Team") 
-st.write("Welcome to EasyOptim Developed by Abdellatif Ahmed")
+st.markdown(
+    """
+    <style>
+    .header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: left;
+        font-size: 24px;
+        font-weight: bold;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="header">
+        Hello Nokia Optimization Team
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.write("Please select any desired tool, also updated DB can be uploaded")
+recent_dB = lataftaf.get_log() 
 
 with st.container():
+    status = st.empty()
+    with open(recent_dB[1], "rb") as f:
+        file_data = f.read()
+    b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
+    href = f'<a href="data:file/txt;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{recent_dB[0]}</a>'
+    sites_dB_comment = f"The Sites DB file [ {href} ] already exists. Use upload if a recent one needs to be used."
+    status.markdown(sites_dB_comment, unsafe_allow_html=True)
+    # st.markdown(sites_dB_comment, unsafe_allow_html=True)
+    
     dB_file = st.file_uploader("Sites DB File:", type=["csv"])
+    Is_Update_Nbrs = st.checkbox('Check to update Nbrs')
 
 if st.button("Submit"):
     if dB_file is not None:
         try:
+            dB_file_name = dB_file.name
+            dB_file_date = dB_file_name [:-4][3:]
             # Load and clean the data
             dB_data = pd.read_csv(dB_file, engine='python', encoding='Windows-1252')
-            dB_data = lataftaf.clean_Sites_db(dB_data)
-            
+            dB_data = lataftaf.clean_Sites_db(dB_data,Is_Update_Nbrs,dB_file_name)
+            href = f'<a href="data:file/txt;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{dB_file_name}</a>'
+            sites_dB_comment = f"The Sites DB file [ {href} ] already exists. Use upload if a recent one needs to be used."
+            status.markdown(sites_dB_comment, unsafe_allow_html=True)
             # Define the polygon layer
             Sectors_layer = pdk.Layer(
                 "PolygonLayer",
@@ -63,9 +98,11 @@ if st.button("Submit"):
                     map_style="mapbox://styles/mapbox/streets-v11"
                 )
             )
-            st.write(dB_data.head())
         except Exception as e:
             st.error(f"Error reading Engineer Parameters File: {e}")
+    else:
+        st.error("No Sites DB file slected")
+
 st.markdown(
     """
     <style>
