@@ -54,9 +54,9 @@ if st.button("Submit"):
             # Load and clean the data
             dB_data = pd.read_csv(dB_file, engine='python', encoding='Windows-1252')
             dB_data = lataftaf.clean_Sites_db(dB_data,Is_Update_Nbrs,dB_file_name)
-            href = f'<a href="data:file/txt;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{dB_file_name}</a>'
-            sites_dB_comment = f"The Sites DB file [ {href} ] already exists. Use upload if a recent one needs to be used."
-            status.markdown(sites_dB_comment, unsafe_allow_html=True)
+            # href = f'<a href="data:file/txt;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{dB_file_name}</a>'
+            # sites_dB_comment = f"The Sites DB file [ {href} ] already exists. Use upload if a recent one needs to be used."
+            # status.markdown(sites_dB_comment, unsafe_allow_html=True)
             # Define the polygon layer
             Sectors_layer = pdk.Layer(
                 "PolygonLayer",
