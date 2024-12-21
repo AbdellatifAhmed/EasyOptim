@@ -63,6 +63,7 @@ if st.button("Submit"):
                 b64_file_data = base64.b64encode(file_data).decode()
                 download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(file_path)}">Click to download {os.path.basename(file_path)}</a>'
             st.markdown(download_link, unsafe_allow_html=True)
+
 st.markdown(
     """
     <style>
@@ -85,3 +86,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
