@@ -15,6 +15,7 @@ from geopy.distance import geodesic
 import pyxlsb
 import math
 from scipy.spatial import KDTree
+import subprocess
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
@@ -395,3 +396,6 @@ def update_log(dB_file_name, type):
     }
     with pd.ExcelWriter(easy_optim_log, engine='openpyxl') as writer:
         log_df.to_excel(writer, sheet_name='log', index=False)
+    subprocess.run(["git", "add", easy_optim_log])  # Stage the log file
+    subprocess.run(["git", "commit", "-m", "Updated log file with new entry"])  # Commit the changes
+    subprocess.run(["git", "push", "origin", "main"])  # Push to GitHub
