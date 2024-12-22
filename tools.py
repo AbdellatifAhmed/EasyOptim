@@ -19,7 +19,7 @@ import subprocess
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
-nbrs_db = os.path.join(output_dir, 'estimated_Nbrs.csv')
+nbrs_db = os.path.join(output_dir, 'estimated_Nbrs1.csv')
 easy_optim_log = os.path.join(output_dir, 'log.xlsx')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
