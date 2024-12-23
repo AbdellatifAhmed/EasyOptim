@@ -20,7 +20,7 @@ import subprocess
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
 nbrs_db = os.path.join(output_dir, 'estimated_Nbrs1.csv')
-easy_optim_log = os.path.join(output_dir, 'log.xlsx')
+easy_optim_log = os.path.join(output_dir, 'log1.xlsx')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
@@ -386,7 +386,11 @@ def get_log():
     return recent_filename,recent_filelink
 
 def update_log(dB_file_name, type):
-    log_df = pd.read_excel(easy_optim_log,sheet_name='log')
+    if not os.path.exists(easy_optim_log):
+        columns = ["File Type", "File Name", "Upload Date", "File Date", "Download Link"]
+        log_df = pd.DataFrame(columns=columns)
+    else:
+        log_df = pd.read_excel(easy_optim_log, sheet_name='log')
     log_df.loc[len(log_df)] = {
         "File Type": type,
         "File Name": dB_file_name,
@@ -396,6 +400,4 @@ def update_log(dB_file_name, type):
     }
     with pd.ExcelWriter(easy_optim_log, engine='openpyxl') as writer:
         log_df.to_excel(writer, sheet_name='log', index=False)
-    subprocess.run(["git", "add", easy_optim_log])  # Stage the log file
-    subprocess.run(["git", "commit", "-m", "Updated log file with new entry"])  # Commit the changes
-    subprocess.run(["git", "push", "origin", "main"])  # Push to GitHub
+
