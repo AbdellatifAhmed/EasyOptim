@@ -400,4 +400,6 @@ def update_log(dB_file_name, type):
     }
     with pd.ExcelWriter(easy_optim_log, engine='openpyxl') as writer:
         log_df.to_excel(writer, sheet_name='log', index=False)
+def get_log_file():
+    return easy_optim_log
 
