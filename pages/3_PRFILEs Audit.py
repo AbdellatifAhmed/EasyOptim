@@ -13,10 +13,10 @@ st.write("tool take input PRFILEs and share organized output")
 
 DB_work_Log = lataftaf.get_log_file()
 with open(DB_work_Log, "rb") as f:
-        file_data = f.read()
-        b64_file_data = base64.b64encode(file_data).decode()
-        download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(DB_work_Log)}">Click to download {os.path.basename(DB_work_Log)}</a>'
-    st.markdown(download_link, unsafe_allow_html=True)
+    file_data = f.read()
+    b64_file_data = base64.b64encode(file_data).decode()
+    download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(DB_work_Log)}">Click to download {os.path.basename(DB_work_Log)}</a>'
+st.markdown(download_link, unsafe_allow_html=True)
 
 st.markdown(
     """
