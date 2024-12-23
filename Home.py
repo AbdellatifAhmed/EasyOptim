@@ -5,7 +5,6 @@ import pydeck as pdk
 import base64
 import os
 
-# lataftaf.get_log()
 st.set_page_config(
     page_title="EasyOptim",
     layout="wide"  # Use the full width of the page
@@ -40,9 +39,9 @@ with st.container():
         href = f'<a href="data:file/txt;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{recent_dB[0]}</a>'
         sites_dB_comment = f"The Sites DB file [ {href} ] already exists. Use upload if a recent one needs to be used."
         status.markdown(sites_dB_comment, unsafe_allow_html=True)
-        st.markdown(sites_dB_comment, unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error reading intial File location: {e}")
+    
     dB_file = st.file_uploader("Sites DB File:", type=["csv"])
     Is_Update_Nbrs = st.checkbox('Check to update Nbrs')
 
