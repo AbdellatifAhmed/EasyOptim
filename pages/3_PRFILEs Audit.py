@@ -3,6 +3,7 @@ import pandas as pd
 import tools as lataftaf
 import pydeck as pdk
 from pydeck.types import String
+import base64
 
 st.set_page_config(
     page_title="EasyOptim - PRFILE Audit",
