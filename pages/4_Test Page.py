@@ -51,12 +51,18 @@ with st.expander("Upload/Update Dump & KML File",expanded=st.session_state.expan
     cont1 = st.container()
     with cont1:
         col1,col2 = st.columns(2)
-        col1.markdown("Current KML File: " + href_KML, unsafe_allow_html=True)
+        try:
+            col1.markdown("Current KML File: " + href_KML, unsafe_allow_html=True)
+        except:
+            pass
         file_Kml = col1.file_uploader("Sites DB File:", type=["csv"])
         col1_1,col1_2 = col1.columns(2)
         btn_Kml = col1_1.button("Update KML")
         Is_Update_Nbrs = col1_2.checkbox("Check to update estimated Nbrs")
-        col2.markdown("Current Dump File: " + href_Dmp, unsafe_allow_html=True)
+        try:
+            col2.markdown("Current Dump File: " + href_Dmp, unsafe_allow_html=True)
+        except:
+            pass
         file_Dmp = col2.file_uploader("Param Dump File:", type=["xlsb"])  
         btn_Dmp = col2.button("Update Dump")
 
