@@ -16,7 +16,6 @@ import pyxlsb
 import math
 from scipy.spatial import KDTree
 import subprocess
-import win32com.client as win32
 import pythoncom
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
