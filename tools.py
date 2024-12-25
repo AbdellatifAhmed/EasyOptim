@@ -384,14 +384,15 @@ def get_log():
     log_df['Upload Date'] = pd.to_datetime(log_df['Upload Date'])
     site_db_files = log_df[log_df['File Type'] == 'Sites DB']
     dmp_files = log_df[log_df['File Type'] == 'Parameters Dump']
-    most_recent_KML_file = site_db_files.loc[site_db_files['Upload Date'].idxmax()]
-    most_recent_Dmp_file = dmp_files.loc[dmp_files['Upload Date'].idxmax()]
+    if len(site_db_files)>0:
+        most_recent_KML_file = site_db_files.loc[site_db_files['Upload Date'].idxmax()]
+        recent_KML_filename = most_recent_KML_file['File Name']
+        recent_KML_filelink = most_recent_KML_file['Download Link']
     
-    recent_KML_filename = most_recent_KML_file['File Name']
-    recent_KML_filelink = most_recent_KML_file['Download Link']
-
-    recent_Dmp_filename = most_recent_Dmp_file['File Name']
-    recent_Dmp_filelink = most_recent_Dmp_file['Download Link']
+    if len(dmp_files)>0:
+        most_recent_Dmp_file = dmp_files.loc[dmp_files['Upload Date'].idxmax()]
+        recent_Dmp_filename = most_recent_Dmp_file['File Name']
+        recent_Dmp_filelink = most_recent_Dmp_file['Download Link']
 
     return recent_KML_filename,recent_KML_filelink,recent_Dmp_filename,recent_Dmp_filelink
 
