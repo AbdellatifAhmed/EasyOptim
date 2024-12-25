@@ -16,7 +16,7 @@ import pyxlsb
 import math
 from scipy.spatial import KDTree
 import subprocess
-import pythoncom
+
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
