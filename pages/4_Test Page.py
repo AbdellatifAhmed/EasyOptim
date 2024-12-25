@@ -30,19 +30,19 @@ st.markdown(
 
 st.write("Please select the desired tool on side bar, also updated DB can be uploaded")
 recent_dB = lataftaf.get_log()
-try:
-    with open(recent_dB[1], "rb") as f:
-        file_data = f.read()
-    b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
-    href_KML = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{recent_dB[0]}</a>'
+# try:
+#     with open(recent_dB[1], "rb") as f:
+#         file_data = f.read()
+#     b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
+#     href_KML = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{recent_dB[0]}</a>'
     
-    with open(recent_dB[3], "rb") as f:
-        file_data = f.read()
-    b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
-    href_Dmp = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(recent_dB[3])}">{recent_dB[2]}</a>'
+#     with open(recent_dB[3], "rb") as f:
+#         file_data = f.read()
+#     b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
+#     href_Dmp = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(recent_dB[3])}">{recent_dB[2]}</a>'
 
-except Exception as e:
-        st.error(f"Error reading intial Files location: {e}")
+# except Exception as e:
+#         st.error(f"Error reading intial Files location: {e}")
     
 if "expanded" not in st.session_state:
     st.session_state.expanded = True
@@ -52,7 +52,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=st.session_state.expan
     with cont1:
         col1,col2 = st.columns(2)
         try:
-            col1.markdown("Current KML File: " + href_KML, unsafe_allow_html=True)
+            col1.markdown("Current KML File: " + recent_dB[0], unsafe_allow_html=True)
         except:
             pass
         file_Kml = col1.file_uploader("Sites DB File:", type=["csv"])
@@ -60,7 +60,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=st.session_state.expan
         btn_Kml = col1_1.button("Update KML")
         Is_Update_Nbrs = col1_2.checkbox("Check to update estimated Nbrs")
         try:
-            col2.markdown("Current Dump File: " + href_Dmp, unsafe_allow_html=True)
+            col2.markdown("Current Dump File: " + recent_dB[2], unsafe_allow_html=True)
         except:
             pass
         file_Dmp = col2.file_uploader("Param Dump File:", type=["xlsb"])  
