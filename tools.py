@@ -388,11 +388,17 @@ def get_log():
         most_recent_KML_file = site_db_files.loc[site_db_files['Upload Date'].idxmax()]
         recent_KML_filename = most_recent_KML_file['File Name']
         recent_KML_filelink = most_recent_KML_file['Download Link']
-    
+    else:
+        recent_KML_filename = None
+        recent_KML_filelink = None
+
     if len(dmp_files)>0:
         most_recent_Dmp_file = dmp_files.loc[dmp_files['Upload Date'].idxmax()]
         recent_Dmp_filename = most_recent_Dmp_file['File Name']
         recent_Dmp_filelink = most_recent_Dmp_file['Download Link']
+    else:
+        recent_Dmp_filename = None
+        recent_Dmp_filelink = None
 
     return recent_KML_filename,recent_KML_filelink,recent_Dmp_filename,recent_Dmp_filelink
 
