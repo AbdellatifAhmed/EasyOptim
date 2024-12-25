@@ -16,11 +16,14 @@ import pyxlsb
 import math
 from scipy.spatial import KDTree
 import subprocess
+import win32com.client as win32
+import pythoncom
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
 nbrs_db = os.path.join(output_dir, 'estimated_Nbrs1.csv')
 easy_optim_log = os.path.join(output_dir, 'log.xlsx')
+para_dump = os.path.join(output_dir, 'dump.xlsb')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
@@ -216,15 +219,16 @@ def clean_Sites_db(sites_df,Is_Update_Nbrs,dB_file_name):
     sites_df.columns = sites_df.columns.str.strip()
     sites_df['NodeB Id'] = sites_df['NodeB Name'].apply(lambda x: x.split('-')[0])
     sites_df['Sector_ID'] = sites_df.apply(lambda row: (str(row['NodeB Id']) +'_' + str(row['Cell Name'])[-2:][:1]), axis=1)
-    sites_df["polygon"] = sites_df.apply(lambda row: calculate_sector(row["Lat"], row["Long"], row["Bore"]), axis=1)
+    sites_df["polygon"] = sites_df.apply(lambda row: calculate_sector_polygon(row["Lat"], row["Long"], row["Bore"]), axis=1)
+    sites_df["Label"] = sites_df["polygon"].apply(lambda x: x[2])
     sites_df["coordinates"] = sites_df.apply(lambda row: get_coordinate(row["Long"], row["Lat"]), axis=1)
     sites_df.to_csv(sites_db, index=False)
-    update_log(dB_file_name,'Sites DB')
+    update_log(dB_file_name,'Sites DB',sites_db)
     if Is_Update_Nbrs:
         get_Nbrs(sites_df,8)
     return sites_df
 
-def calculate_sector(latitude, longitude, azimuth, radius=0.001):
+def calculate_sector_polygon(latitude, longitude, azimuth, radius=0.001):
     # Convert azimuth to radians
     azimuth_rad = math.radians(azimuth)
     width = math.radians(30)  # Sector width of ±15 degrees (30 degrees total)
@@ -241,7 +245,7 @@ def calculate_sector(latitude, longitude, azimuth, radius=0.001):
     lat3 = latitude + radius * math.cos(azimuth_rad + width)
     lon3 = longitude + radius * math.sin(azimuth_rad + width)
 
-    return [[longitude, latitude], [lon1, lat1], [lon2, lat2], [lon3, lat3], [longitude, latitude]]
+    return [[latitude, longitude], [lat1, lon1], [lat2, lon2], [lat3, lon3], [latitude, longitude]]
 
 def get_coordinate(longitude,latitude):
     return [longitude, latitude]
@@ -380,26 +384,51 @@ def get_log():
     log_df = pd.read_excel(easy_optim_log,sheet_name='log')
     log_df['Upload Date'] = pd.to_datetime(log_df['Upload Date'])
     site_db_files = log_df[log_df['File Type'] == 'Sites DB']
-    most_recent_file = site_db_files.loc[site_db_files['Upload Date'].idxmax()]
-    recent_filename = most_recent_file['File Name']
-    recent_filelink = most_recent_file['Download Link']
-    return recent_filename,recent_filelink
+    dmp_files = log_df[log_df['File Type'] == 'Parameters Dump']
+    most_recent_KML_file = site_db_files.loc[site_db_files['Upload Date'].idxmax()]
+    most_recent_Dmp_file = dmp_files.loc[dmp_files['Upload Date'].idxmax()]
+    
+    recent_KML_filename = most_recent_KML_file['File Name']
+    recent_KML_filelink = most_recent_KML_file['Download Link']
 
-def update_log(dB_file_name, type):
+    recent_Dmp_filename = most_recent_Dmp_file['File Name']
+    recent_Dmp_filelink = most_recent_Dmp_file['Download Link']
+
+    return recent_KML_filename,recent_KML_filelink,recent_Dmp_filename,recent_Dmp_filelink
+
+def update_log(dB_file_name, type,file_link):
+    file_Date = ""
     if not os.path.exists(easy_optim_log):
         columns = ["File Type", "File Name", "Upload Date", "File Date", "Download Link"]
         log_df = pd.DataFrame(columns=columns)
     else:
         log_df = pd.read_excel(easy_optim_log, sheet_name='log')
+    if type == "Sites DB":
+        file_Date = dB_file_name[:-4][3:]
+    elif type == "Parameters Dump":
+        file_Date = dB_file_name[8:]
+    else:
+        file_Date = "Unknown"
+
     log_df.loc[len(log_df)] = {
         "File Type": type,
         "File Name": dB_file_name,
         "Upload Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "File Date": dB_file_name[:-4][3:],
-        "Download Link":sites_db
+        "Download Link":file_link
     }
     with pd.ExcelWriter(easy_optim_log, engine='openpyxl') as writer:
         log_df.to_excel(writer, sheet_name='log', index=False)
 def get_log_file():
     return easy_optim_log
 
+def upload_Dmp(file_Dmp):
+    try:    
+        file_Dmp_Name = file_Dmp.name
+        with open(para_dump, "wb") as f:
+            f.write(file_Dmp.getbuffer())
+        print("file writer successfuly",para_dump)
+    except Exception as e:
+        print(f"Error processing file: {e}")
+    
+    update_log(file_Dmp_Name,'Parameters Dump',para_dump)
