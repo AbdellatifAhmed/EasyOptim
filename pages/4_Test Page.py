@@ -31,12 +31,12 @@ st.markdown(
 st.write("Please select the desired tool on side bar, also updated DB can be uploaded")
 recent_dB = lataftaf.get_log()
 try:
-    with open(recent_dB[1], "rb") as f:
-        file_data = f.read()
-    b64_file_data = base64.b64encode(file_data).decode()  # Encode log content to base64
-    href_KML = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(recent_dB[1])}">{recent_dB[0]}</a>'
-    
+    kml_file_path = Path(recent_dB[1])    
     dump_file_path = Path(recent_dB[3])
+    if kml_file_path.exists():
+        href_KML = f'<a href="{kml_file_path}" download>{recent_dB[0]}</a>'
+    else:
+        href_KML = "KML file not found."
     if dump_file_path.exists():
         href_Dmp = f'<a href="{dump_file_path}" download>{recent_dB[2]}</a>'
     else:
