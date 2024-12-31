@@ -9,8 +9,24 @@ st.set_page_config(
     page_title="EasyOptim - LNADJGNB Audit",
     layout="wide"  # Use the full width of the page
 )
-st.title("Audit LNADJGNB Tool")
-st.write("Audit LNADJGNB Tool uses DB, LNADJGNB object to find the instances with Missing IPs, also provide instance that should be deleted as they are very far")
+st.markdown(
+    """
+    <style>
+    .header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: left;
+        font-size: 30px;
+        font-weight: bold;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="header">
+        EasyOptim - Create XML Tool 
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 with st.container():
     col1, col2 = st.columns(2) 
     dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx", "txt"])
