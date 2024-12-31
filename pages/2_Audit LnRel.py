@@ -12,8 +12,24 @@ st.set_page_config(
     page_title="EasyOptim - Audit LNREL",
     layout="wide"  # Use the full width of the page
 )
-st.title("Audit LNREL Tool")
-st.write("Audit LNREL Tool uses the DB, LNREL Objects, Report (RSLTE031)")
+st.markdown(
+    """
+    <style>
+    .header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: left;
+        font-size: 30px;
+        font-weight: bold;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="header">
+        EasyOptim - Audit LnRel Tool 
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 with st.container():
     col1, col2,col3 = st.columns(3) 
