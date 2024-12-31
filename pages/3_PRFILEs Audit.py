@@ -10,8 +10,24 @@ st.set_page_config(
     page_title="EasyOptim - PRFILE Audit",
     layout="wide"  # Use the full width of the page
 )
-st.title("PRFILE Audit Tool")
-st.write("tool take input PRFILEs and share organized output")
+st.markdown(
+    """
+    <style>
+    .header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: left;
+        font-size: 30px;
+        font-weight: bold;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="header">
+        EasyOptim - PRFILE Check Tool 
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 DB_work_Log = lataftaf.get_log_file()
 with open(DB_work_Log, "rb") as f:
