@@ -34,7 +34,7 @@ st.markdown(
 with st.expander("Import RNCs PRFILEs", expanded=True):
     container1 = st.container()
     with container1:
-        files_txt = st.file_uploader("Select RNCs PRFILEs:", type=[".txt"], accept_multiple_files=True)
+        files_txt = st.file_uploader("Select RNCs PRFILEs - better to Name each File with its RNC Name or RNC ID:", type=[".txt"], accept_multiple_files=True)
         btn_checkPRFILE = st.button("Check PRFILEs", key="prfiles_button")
         if btn_checkPRFILE:
             output_status = lataftaf.audit_prfiles(files_txt)
