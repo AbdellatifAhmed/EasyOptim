@@ -75,12 +75,15 @@ with st.expander("Create XML Tool", expanded=True):
         btn_makeXML = st.button("Create XML", key="makeXML_button")
     if btn_makeXML:
         out = lataftaf.valide_make_XML(st.session_state.selected_object,file_csv,rad_action)
-        st.write(out)
-        with open(created_xml_link, "rb") as f:
-            file_data = f.read()
-            b64_file_data = base64.b64encode(file_data).decode()
-            download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(created_xml_link)}">Click to download {os.path.basename(created_xml_link)}</a>'
-        st.markdown(download_link, unsafe_allow_html=True)
+        if out == "XML Created Successfully!":
+            st.write(out)
+            with open(created_xml_link, "rb") as f:
+                file_data = f.read()
+                b64_file_data = base64.b64encode(file_data).decode()
+                download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(created_xml_link)}">Click to download {os.path.basename(created_xml_link)}</a>'
+            st.markdown(download_link, unsafe_allow_html=True)
+        else:
+            st.error(out)
 
 
     
