@@ -16,6 +16,7 @@ import pyxlsb
 import math
 from scipy.spatial import KDTree
 import subprocess
+import ast
 
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
@@ -23,6 +24,8 @@ sites_db = os.path.join(output_dir, 'sites_db.csv')
 nbrs_db = os.path.join(output_dir, 'estimated_Nbrs1.csv')
 easy_optim_log = os.path.join(output_dir, 'log.xlsx')
 para_dump = os.path.join(output_dir, 'dump.xlsb')
+xml_objects = os.path.join(output_dir, 'XML Objects.xlsx')
+created_xml_link = os.path.join(output_dir, 'OutputXML.xml')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
@@ -438,3 +441,66 @@ def upload_Dmp(file_Dmp):
         print(f"Error processing file: {e}")
     
     update_log(file_Dmp_Name,'Parameters Dump',para_dump)
+def valide_make_XML(selected_Object, changes_csv,action):
+    df_xml_objects = pd.read_excel(xml_objects)
+    filtered_row = df_xml_objects[df_xml_objects["Object"] == selected_Object].iloc[0]
+    mandatory_columns = filtered_row["Mandatory_ID"]
+    mandatory_columns = ast.literal_eval(mandatory_columns)
+    parameters_list = filtered_row["Parameters_List"]
+    parameters_list = ast.literal_eval(parameters_list)
+    df_changes_csv = pd.read_csv(changes_csv)
+    # validate Mandatory Columns
+    output_string = []
+    missing_columns = []
+    unrelated_parameters = []
+    output_string.append(mandatory_columns)
+    output_string.append(df_changes_csv.columns)
+    for column in mandatory_columns:
+        if column not in df_changes_csv.columns:
+            missing_columns.append(column)
+
+    for col in df_changes_csv.columns :
+        if col not in mandatory_columns: 
+            if col not in parameters_list:
+                unrelated_parameters.append(col)
+    
+    if len(missing_columns) > 0:
+        return "Missing Mandatory Identifiers", missing_columns
+    else:
+        if len(unrelated_parameters) > 0:
+            return "given Parameters to change >>> " + str(unrelated_parameters) +  " <<< are not in such object  " + str(selected_Object)
+        else:
+            # Now everything is ok, we will build the XML
+
+            now = datetime.now()
+            formatted_now = now.strftime("%Y-%m-%dT%H:%M:%S")
+            root = ET.Element("raml", xmlns="raml21.xsd", version="2.1")
+            cm_data = ET.SubElement(root, "cmData", type="plan")
+            header = ET.SubElement(cm_data, "header")
+            ET.SubElement(header, "log", dateTime=formatted_now, action="created", appInfo="Abdellatif-Ahmed")
+
+            
+            for _, row in df_changes_csv.iterrows():
+                dist_name = "PLMN-PLMN/"
+                i= 0
+                for col in mandatory_columns:
+                    if i < len(mandatory_columns)-1:
+                        dist_name = dist_name + col + "-" + row[col].astype(str) + "/"
+                    else:
+                        dist_name = dist_name + col + "-" + row[col].astype(str)
+                    i = i+1
+                if action == "update" or action == "create":
+                    managed_object = ET.SubElement(cm_data,"managedObject",class_=selected_Object,distName=dist_name,version="xL21A_2012_003",operation=action)
+                    for parameter in df_changes_csv.columns:
+                        if parameter not in mandatory_columns:
+                            ET.SubElement(managed_object, "p", name=parameter).text = row[parameter].astype(str)
+                elif action == "delete":
+                    ET.SubElement(cm_data, "managedObject", class_=selected_Object, distName=dist_name,version="xL21A_2012_003", operation=action)
+                else:
+                    return "Error Un-Identified operation!"
+        
+            xml_data = ET.tostring(root, encoding="utf-8", method="xml")  
+            with open(created_xml_link, "wb") as xmlfile:
+                xmlfile.write(xml_data)
+            return "XML Created Successfully!"  
+
