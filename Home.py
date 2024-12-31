@@ -83,9 +83,6 @@ with st.expander("Upload KPIs & Performance Reports",expanded=st.session_state.e
         col5G.file_uploader("5G Performance Report:", type=["csv"])
         col5G.button("Update 5G Report")
 
-with st.expander("Cleaned KML File",expanded=st.session_state.expanded):
-    kml_data = pd.read_csv(recent_dB[1], engine='python', encoding='Windows-1252')
-    st.write(kml_data.head())
 
 if btn_Kml:
     if file_Kml is not None:
