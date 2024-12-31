@@ -436,6 +436,7 @@ def upload_Dmp(file_Dmp):
         file_Dmp_Name = file_Dmp.name
         with open(para_dump, "wb") as f:
             f.write(file_Dmp.getbuffer())
+        update_log(file_Dmp_Name,'Parameters Dump',para_dump)
         print("file writer successfuly",para_dump)
     except Exception as e:
         print(f"Error processing file: {e}")
