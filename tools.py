@@ -26,6 +26,7 @@ easy_optim_log = os.path.join(output_dir, 'log.xlsx')
 para_dump = os.path.join(output_dir, 'dump.xlsb')
 xml_objects = os.path.join(output_dir, 'XML Objects.xlsx')
 created_xml_link = os.path.join(output_dir, 'OutputXML.xml')
+xls_PRFILEs = os.path.join(output_dir, 'PRFILE.xlsx')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
@@ -504,4 +505,42 @@ def valide_make_XML(selected_Object, changes_csv,action):
             with open(created_xml_link, "wb") as xmlfile:
                 xmlfile.write(xml_data)
             return "XML Created Successfully!"  
+
+def audit_prfiles(files):
+    try:
+        print("inside the function")
+        data = []
+        for prfile in files:
+            prfile_name = prfile.name[:-4]
+            lines = prfile.getvalue().decode("utf-8").splitlines()
+            current_class = None
+            for line in lines:
+                line = line.strip()
+                if line.startswith("PARAMETER CLASS:"):
+                    # Extract the class name
+                    current_class = line.replace("PARAMETER CLASS:", "").strip()
+                elif line and line[0].isdigit():
+                    # Extract parameter data
+                    parts = line.split()
+                    identifier = parts[0]
+                    parameter_name = " ".join(parts[1:-2])
+                    value_hex = parts[-2]
+                    change_possibility = parts[-1]
+                    data.append([prfile_name,current_class, identifier, parameter_name, value_hex, change_possibility])
+        df_Prfile = pd.DataFrame(data, columns=["RNC", "Parameter Class", "Identifier", "Parameter Name", "Value (Hex)", "Change Possibility"])
+        pivot_df = df_Prfile.pivot_table(
+            index=["Parameter Class", "Identifier", "Parameter Name", "Change Possibility"],
+            columns="RNC",
+            values=["Value (Hex)"],
+            aggfunc="first"  # Since there should be one value per combination
+        )
+        pivot_df.columns = [f"{col[1]} - {col[0]}" for col in pivot_df.columns]
+        pivot_df.reset_index(inplace=True)
+        with pd.ExcelWriter(xls_PRFILEs, engine='openpyxl') as writer:
+            pivot_df.to_excel(writer, sheet_name='PRFILE', index=False)
+        return "PRFILEs Preparation Done Successfully!"
+    except Exception as e:
+        return e
+
+    
 
