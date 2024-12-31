@@ -27,7 +27,7 @@ st.markdown(
     }
     </style>
     <div class="header">
-        Hello Nokia Optimization Team - EasyOptim - Create XML Tool 
+        EasyOptim - Create XML Tool 
     </div>
     """,
     unsafe_allow_html=True,
