@@ -57,6 +57,13 @@ if "table_criteria" not in st.session_state:
 
 # Table interface inside an expander
 with st.expander("Specify or Add KPIs/Thresholds for Worst Cells Criteria", expanded=True):
+    st.write("**Instructions:**")
+    st.markdown("""
+    - **Technology**: Limited to `2G`, `3G`, `4G`, `5G`.
+    - **Logical_Condition1, Logical_Condition2**: Limited to `<`, `>`, `=`, `<=`, `>=`.
+    - **Indicator1, Indicator1**: must be same name in KPIs report related to the technology.
+    - **Input KPIs reports must be in CSV formate, [output report from Nokia Netact are with SemiColumn delimiter].
+    """)
     tech_col,kpi_col,thrshld_col = st.columns(3)
     drpbx_tech = tech_col.selectbox("Technology:", options=tech_options, key="drpbx_tech",index =tech_options.index(default_value))
     kpi_alias_input = kpi_col.text_input("KPI Name/Alias:", "")
