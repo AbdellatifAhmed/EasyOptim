@@ -147,39 +147,40 @@ with st.expander("Select the KPIs Reports for each Technology",expanded=True):
 
     btn_initiate_Wcl = st.button("Start", key="btn_initiate_Wcl") 
     
-        if btn_initiate_Wcl:
-            if not files_2G and not files_3G and not files_4G and not files_5G:
-                st.error("You did not provide any KPIs reports to check Worst Cells. Please upload reports and then press Start.")
-            else:
-                if files_2G:
-                    wcl_2G = lataftaf.get_wcl(st.session_state.table_criteria,files_2G,'2G',threshold_days)
-                    with open(wcl_2G, "rb") as f:
-                        file_data = f.read()
-                        b64_file_data = base64.b64encode(file_data).decode()
-                        download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_2G)}">Click to download 2G WCL File {os.path.basename(wcl_2G)}</a>'
-                    st.markdown(download_link, unsafe_allow_html=True)
-                
-                if files_3G:
-                    wcl_3G = lataftaf.get_wcl(st.session_state.table_criteria,files_3G,'3G',threshold_days)
-                    with open(wcl_3G, "rb") as f:
-                        file_data = f.read()
-                        b64_file_data = base64.b64encode(file_data).decode()
-                        download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_3G)}">Click to download 3G WCL File {os.path.basename(wcl_3G)}</a>'
-                    st.markdown(download_link, unsafe_allow_html=True)
-    
-                if files_4G:
-                    wcl_4G = lataftaf.get_wcl(st.session_state.table_criteria,files_4G,'4G',threshold_days)
-                    with open(wcl_4G, "rb") as f:
-                        file_data = f.read()
-                        b64_file_data = base64.b64encode(file_data).decode()
-                        download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_4G)}">Click to download 4G WCL File {os.path.basename(wcl_4G)}</a>'
-                    st.markdown(download_link, unsafe_allow_html=True)
-    
-                if files_5G:
-                    wcl_5G = lataftaf.get_wcl(st.session_state.table_criteria,files_5G,'5G',threshold_days)
-                    with open(wcl_5G, "rb") as f:
-                        file_data = f.read()
-                        b64_file_data = base64.b64encode(file_data).decode()
-                        download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_5G)}">Click to download 5G WCL File {os.path.basename(wcl_5G)}</a>'
-                    st.markdown(download_link, unsafe_allow_html=True)
+    if btn_initiate_Wcl:
+        if not files_2G and not files_3G and not files_4G and not files_5G:
+            st.error("You did not provide any KPIs reports to check Worst Cells. Please upload reports and then press Start.")
+        else:
+            if files_2G:
+                wcl_2G = lataftaf.get_wcl(st.session_state.table_criteria,files_2G,'2G',threshold_days)
+                with open(wcl_2G, "rb") as f:
+                    file_data = f.read()
+                    b64_file_data = base64.b64encode(file_data).decode()
+                    download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_2G)}">Click to download 2G WCL File {os.path.basename(wcl_2G)}</a>'
+                st.markdown(download_link, unsafe_allow_html=True)
+            
+            if files_3G:
+                wcl_3G = lataftaf.get_wcl(st.session_state.table_criteria,files_3G,'3G',threshold_days)
+                with open(wcl_3G, "rb") as f:
+                    file_data = f.read()
+                    b64_file_data = base64.b64encode(file_data).decode()
+                    download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_3G)}">Click to download 3G WCL File {os.path.basename(wcl_3G)}</a>'
+                st.markdown(download_link, unsafe_allow_html=True)
+
+            if files_4G:
+                wcl_4G = lataftaf.get_wcl(st.session_state.table_criteria,files_4G,'4G',threshold_days)
+                with open(wcl_4G, "rb") as f:
+                    file_data = f.read()
+                    b64_file_data = base64.b64encode(file_data).decode()
+                    download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_4G)}">Click to download 4G WCL File {os.path.basename(wcl_4G)}</a>'
+                st.markdown(download_link, unsafe_allow_html=True)
+
+            if files_5G:
+                wcl_5G = lataftaf.get_wcl(st.session_state.table_criteria,files_5G,'5G',threshold_days)
+                with open(wcl_5G, "rb") as f:
+                    file_data = f.read()
+                    b64_file_data = base64.b64encode(file_data).decode()
+                    download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_5G)}">Click to download 5G WCL File {os.path.basename(wcl_5G)}</a>'
+                st.markdown(download_link, unsafe_allow_html=True)
+        
 
