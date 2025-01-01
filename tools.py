@@ -542,5 +542,130 @@ def audit_prfiles(files):
     except Exception as e:
         return e
 
+def get_wcl(df_criteria,wcl_KPIs,tech,thrshld_days):
+    start_time = time.time()
+    WCL_file = os.path.join(output_dir, tech +'_WCL.xlsx')
+    if len(wcl_KPIs)>0:
+        print(tech," has ",len(wcl_KPIs)," files")
+        WCL_Criteria_url = os.path.join(output_dir, 'WCL_Criteria.xlsx')
+        identity_columns = []
+        date_columns = []
+        patterns = ['cell', 'site', 'wbts', 'nodeb', 'node b','wcel' ]
+        date_patterns = ['date', 'time','period']
+        date_col = ''
+        i=0
+        kpis_csvs = []
+        for kpis_file in wcl_KPIs:
+            kpis_df = pd.read_csv(kpis_file,delimiter=';')
+            kpis_csvs.append(kpis_df)            
+            identity_cols = [col for col in kpis_df.columns if any(pattern in col.lower() for pattern in patterns)]
+            # identity_cols = [value for value in identity_cols if 'asiacell' not in value.lower()]
+            date_cols = [col for col in kpis_df.columns if any(pattern in col.lower() for pattern in date_patterns)]
+            if i==0:
+                identity_columns = identity_cols
+                date_columns = date_cols
+            else:
+                identity_columns = [value for value in identity_cols if value in identity_columns]
+                date_columns = [value for value in date_cols if value in date_columns]
+
+            i = i+1
+        date_col = date_columns[0]
+        # df = pd.read_excel(WCL_Criteria_url)
+        criteria = df_criteria[df_criteria['Technology']==tech]
+        criteria = criteria.fillna('')
+        not_exiting_Kpis = []
+        output = {}
+        output_summary = {}
+        for index, row in criteria.iterrows():
+            try:
+                kpis_cols = identity_columns.copy()
+                kpis_cols.append(date_col)
+                # print(kpis_cols)
+                kpi_name = str(row['KPI_Name'])
+                kpis_cols.append(str(row['Indicator1']))
+                if str(row['Indicator2']) != '':
+                    kpis_cols.append(str(row['Indicator2']))
+                selected_Kpi = pd.DataFrame()
+                missing_indicators = []
+                for kpis_file in kpis_csvs:
+                    if str(row['Indicator1']) in kpis_file.columns:
+                        if str(row['Indicator2']) != '' and str(row['Indicator2']) in kpis_file.columns:
+                            selected_Kpi = pd.concat([selected_Kpi,kpis_file[kpis_cols]],ignore_index = True)
+                        elif str(row['Indicator2']) == '':
+                            selected_Kpi = pd.concat([selected_Kpi,kpis_file[kpis_cols]],ignore_index = True)
+                        else:
+                            missing_indicators.append(str(row['Indicator2']))
+                    else:
+                        missing_indicators.append(str(row['Indicator1']))
+
+                selected_Kpi.drop_duplicates(inplace=True)
+                try:
+                    selected_Kpi[str(row['Indicator1'])] = selected_Kpi[str(row['Indicator1'])].apply(pd.to_numeric , errors='coerce')
+                    selected_Kpi['TH1_Crossed'] = apply_condition(selected_Kpi[str(row['Indicator1'])], str(row['Logical_Condition1']) , float(str(row['Threshold1'])))
+                except:
+                    
+                    print(kpi_name,":first indicator had a problem")
+                
+                if str(row['Indicator2']) != '': 
+                    selected_Kpi[str(row['Indicator2'])] = selected_Kpi[str(row['Indicator2'])].apply(pd.to_numeric , errors='coerce')
+                    selected_Kpi['TH2_Crossed'] = apply_condition(selected_Kpi[str(row['Indicator2'])], str(row['Logical_Condition2']) , float(str(row['Threshold2'])))
+                    selected_Kpi['THLDs_Crossed'] = (selected_Kpi['TH1_Crossed'] & selected_Kpi['TH2_Crossed']).astype(int)
+                else:
+                    selected_Kpi['THLDs_Crossed'] = (selected_Kpi['TH1_Crossed']).astype(int)
+                
+                avail_dates = len(selected_Kpi[date_col].unique())
+                if avail_dates >= thrshld_days:
+                    if str(row['Indicator2']) != '':
+                        kpi_pivot = selected_Kpi.pivot_table(values=[str(row['Indicator1']),str(row['Indicator2']),'THLDs_Crossed'], index=identity_columns, columns=date_col, aggfunc='sum', fill_value=0)
+                    else:
+                        kpi_pivot = selected_Kpi.pivot_table(values=[str(row['Indicator1']),'THLDs_Crossed'], index=identity_columns, columns=date_col, aggfunc='sum', fill_value=0)
+                    kpi_pivot.reset_index(inplace=True)
+                    kpi_pivot.columns = ['_'.join(map(str, col)).strip() for col in kpi_pivot.columns.values]
+                    thrshld_col = [value for value in kpi_pivot.columns if 'THLDs_Crossed' in value]
+                    kpi_pivot['Problematic'] = kpi_pivot[thrshld_col].sum(axis=1)
+                    kpi_pivot = kpi_pivot[kpi_pivot['Problematic']>=thrshld_days]
+
+                    kpi_pivot = kpi_pivot.drop(columns=thrshld_col)
+                    # print(kpi_name)
+                    # print(kpi_pivot)
+                    output[kpi_name] = kpi_pivot
+                    output_summary[kpi_name] = len(kpi_pivot)
+            except Exception as e:
+                not_exiting_Kpis.append(kpi_name)
+                output_summary[kpi_name] = "Error: Missing Counters/Indicators" 
+        
+        if output_summary:
+            summary = pd.DataFrame.from_dict(output_summary, orient='index', columns=['Count'])
+            print(summary)
+        else:
+            print("No KPIs met the criteria.")
+        if len(output_summary)>0:
+            with pd.ExcelWriter(WCL_file, engine='openpyxl') as writer:
+                summary.to_excel(writer, sheet_name='Summary', index=True)
+            with pd.ExcelWriter(WCL_file, engine='openpyxl',mode='a') as writer:
+                for kpi, wcls in output.items():
+                    wcls.to_excel(writer, sheet_name=kpi, index=True)
+            end_time =time.time()
+            duration = str(round((end_time - start_time),0))+" Seconds"
+            print(duration)
+            return WCL_file
+        else:
+            print("missing Counters or KPIs in the given files")
+    else:
+        print("no KPIs received in ", tech)
+
+def apply_condition(indicator, condition, threshold):
+    if condition == '>':
+        return indicator > threshold
+    elif condition == '<':
+        return indicator < threshold
+    elif condition == '=':
+        return indicator == threshold
+    elif condition == '>=':
+        return indicator >= threshold
+    elif condition == '<=':
+        return indicator <= threshold
+    else:
+        raise ValueError(f"Unknown condition: {condition}")    
     
 
