@@ -17,7 +17,7 @@ import math
 from scipy.spatial import KDTree
 import subprocess
 import ast
-
+from xml.dom import minidom
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
