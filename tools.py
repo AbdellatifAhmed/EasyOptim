@@ -443,6 +443,7 @@ def upload_Dmp(file_Dmp):
         print(f"Error processing file: {e}")
     
     update_log(file_Dmp_Name,'Parameters Dump',para_dump)
+
 def valide_make_XML(selected_Object, changes_csv,action):
     df_xml_objects = pd.read_excel(xml_objects)
     filtered_row = df_xml_objects[df_xml_objects["Object"] == selected_Object].iloc[0]
@@ -473,15 +474,12 @@ def valide_make_XML(selected_Object, changes_csv,action):
             return "given Parameters to change >>> " + str(unrelated_parameters) +  " <<< are not in such object  " + str(selected_Object)
         else:
             # Now everything is ok, we will build the XML
-
             now = datetime.now()
             formatted_now = now.strftime("%Y-%m-%dT%H:%M:%S")
             root = ET.Element("raml", xmlns="raml21.xsd", version="2.1")
             cm_data = ET.SubElement(root, "cmData", type="plan")
             header = ET.SubElement(cm_data, "header")
             ET.SubElement(header, "log", dateTime=formatted_now, action="created", appInfo="Abdellatif-Ahmed")
-
-            
             for _, row in df_changes_csv.iterrows():
                 dist_name = "PLMN-PLMN/"
                 i= 0
@@ -501,18 +499,16 @@ def valide_make_XML(selected_Object, changes_csv,action):
                 else:
                     return "Error Un-Identified operation!"
         
+            # xml_data = ET.tostring(root, encoding="utf-8", method="xml")
             xml_data = ET.tostring(root, encoding="utf-8", method="xml")
             dom = minidom.parseString(xml_data)  # Parse the XML string
             pretty_xml = dom.toprettyxml(indent="  ")  # Add indentation and line breaks
             with open(created_xml_link, "w", encoding="utf-8") as xmlfile:
-                xmlfile.write(pretty_xml) 
+                xmlfile.write(pretty_xml)  
             # with open(created_xml_link, "wb") as xmlfile:
             #     xmlfile.write(xml_data)
-            # with open(created_xml_link, "w", encoding="utf-8") as xmlfile:
-            #     xmlfile.write(pretty_xml)
+            return "XML Created Successfully!"
             
-            return "XML Created Successfully!"  
-
 def audit_prfiles(files):
     try:
         print("inside the function")
