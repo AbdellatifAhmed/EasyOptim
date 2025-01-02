@@ -502,10 +502,10 @@ def valide_make_XML(selected_Object, changes_csv,action):
                     return "Error Un-Identified operation!"
         
             xml_data = ET.tostring(root, encoding="utf-8", method="xml")
-            parsed = minidom.parseString(xml_data)
-            pretty_xml = parsed.toprettyxml(indent="  ")
+            # parsed = minidom.parseString(xml_data)
+            # pretty_xml = parsed.toprettyxml(indent="  ")
             with open(created_xml_link, "wb") as xmlfile:
-                xmlfile.write(pretty_xml)
+                xmlfile.write(xml_data)
             return "XML Created Successfully!"  
 
 def audit_prfiles(files):
