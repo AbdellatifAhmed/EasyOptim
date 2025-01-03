@@ -38,7 +38,8 @@ with st.container():
     - **Sites DB File**: Limited to `xlsx, csv `, Must contain `NodeB ID`, `Lat`, `Long` Columns.
     - **Perfroamcen Report**: it should be the report `RSLTE031` and it should be collected as *Whole Period* not *daily* or *Hourly*.
     - **Function**: 
-        1. It prepare 
+        1. Tool Just provide you back with the Same report after adding to it the distance between source and Target.
+        2. Function under development to suggest an `cellIndOffNeigh` or `handoverAllowed` changes based on the Target Cell Location comparing to source.
     """)
     col1, col2,col3 = st.columns(3) 
     dB_file = col1.file_uploader("Sites DB File:", type=["csv", "xlsx", "txt"])
