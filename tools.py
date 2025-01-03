@@ -671,4 +671,88 @@ def apply_condition(indicator, condition, threshold):
     else:
         raise ValueError(f"Unknown condition: {condition}")    
     
+def checkPSC_Nbrs_Clash(kmlFile,dumpFile):
+    start_time = time.time()
+    print("PSC Clashes tool Started!")
+    # df_kml = pd.read_csv(kmlFile, engine='python', encoding='Windows-1252')
+    df_kml = pd.read_excel(kmlFile)
+    df_kml.columns = df_kml.columns.str.strip()
+    df_kml['NodeB Id'] = df_kml['NodeB Name'].apply(lambda x: x.split('-')[0])
+    df_kml['Sector_ID'] = df_kml.apply(lambda row: (str(row['NodeB Id']) +'_' + str(row['Cell Name'])[-2:][:1]), axis=1)
+    xls = pd.ExcelFile(dumpFile, engine='pyxlsb')
+    df_wcel = pd.read_excel(xls, sheet_name='WCEL', header=1)
+    df_wcel.columns = df_wcel.columns.str.strip() 
+    df_wcel['cell_Lkup'] = df_wcel['RNC'].astype(str) + '_' + df_wcel['WBTS'].astype(str) + '_' + df_wcel['WCEL'].astype(str)
+    df_wcel['Sector ID'] = df_wcel.apply(lambda row: (str(row['WBTS']) +'_' + str(row['name'])[-2:][:1]), axis=1)
+    df_wcel['Site Latitude'] = df_wcel['Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
+    df_wcel['Site Longitude'] = df_wcel['Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
 
+    df_adjs = pd.read_excel(xls, sheet_name='ADJS', header=1)
+    df_adjs.columns = df_adjs.columns.str.strip()
+    df_adjs['cell_Lkup'] = df_adjs['RNC'].astype(str) + '_' + df_adjs['WBTS'].astype(str) + '_' + df_adjs['WCEL'].astype(str)
+    df_adjs['Source Cell Name'] = df_adjs['cell_Lkup'].map(dict(zip(df_wcel['cell_Lkup'],df_wcel['name'])))
+    df_adjs['Source Sector ID'] = df_adjs['cell_Lkup'].map(dict(zip(df_wcel['cell_Lkup'],df_wcel['Sector ID'])))
+    df_adjs['Source PSC'] = df_adjs['cell_Lkup'].map(dict(zip(df_wcel['cell_Lkup'],df_wcel['PriScrCode'])))
+    df_adjs['Source Carrier'] = df_adjs['cell_Lkup'].map(dict(zip(df_wcel['cell_Lkup'],df_wcel['UARFCN'])))
+    df_adjs['Source Latitude'] = df_adjs['Source Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
+    df_adjs['Source Longitude'] = df_adjs['Source Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
+
+    df_adjs['Target Cell Name'] = df_adjs['name']
+    df_adjs['Target Sector ID'] = df_adjs.apply(lambda row: (str(row['name'])[:4] +'_' + str(row['name'])[-2:][:1]), axis=1)
+    df_adjs['Target PSC'] = df_adjs['AdjsScrCode']
+    df_adjs['Target Latitude'] = df_adjs['Target Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
+    df_adjs['Target Longitude'] = df_adjs['Target Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
+    df_adjs['Distance'] = df_adjs.apply(
+        lambda row: (
+            calculate_distance(
+                (row['Source Latitude'], row['Source Longitude']),
+                (row['Target Latitude'], row['Target Longitude'])
+                ) if pd.notna(row['Source Latitude']) and pd.notna(row['Source Longitude']) 
+                and pd.notna(row['Target Latitude']) and pd.notna(row['Target Longitude']) 
+                else None
+                ), axis=1)
+    print("Now going to get the CLosest Cell with Same PSC as the Target Cell!")
+    df_adjs['Possible Clash Cell'], df_adjs['Possible PSC Clash Distance'] = zip(*df_adjs.apply(lambda row: calculate_shortest_distance(row, df_kml),axis=1))
+    df_adjs['Possible PSC Clash (Y/N)'] = df_adjs.apply(lambda row: "Y" if row['Possible PSC Clash Distance'] <= row['Distance'] else "N",axis=1)
+    df_output_possible_clashes = df_adjs[df_adjs['Possible PSC Clash (Y/N)'] == "Y"]
+    df_output_possible_clashes = df_output_possible_clashes [df_output_possible_clashes ['Possible Clash Cell']!= df_output_possible_clashes ['Target Cell Name']]
+    
+    with pd.ExcelWriter(psc_clash, engine='openpyxl') as writer:
+        df_output_possible_clashes.to_excel(writer, sheet_name='Possible Clashes', index=False)
+    
+    end_time =time.time()
+    duration = str(round((end_time - start_time),0))+" Seconds"
+    return duration
+
+def calculate_shortest_distance(row, df_kml):
+    target_psc = row['Target PSC']
+    source_carrier = row['Source Carrier']
+    target_sector = row['Target Sector ID']
+    source_lat, source_lon = row['Source Latitude'], row['Source Longitude']
+    
+    # Check if source coordinates are valid
+    if pd.notna(source_lat) and pd.notna(source_lon) and pd.notna(target_psc):
+        # Filter cells in df_kml with the same PriScrCode as Target PSC
+        filtered_cells = df_kml[df_kml['DL Primary Scrambling Code'] == target_psc]
+        filtered_cells = filtered_cells[filtered_cells['Downlink UARFCN'] == source_carrier]
+        filtered_cells = filtered_cells[filtered_cells['Sector_ID'] != target_sector]  # Ensure it's not the same sector
+        # Remove rows with invalid coordinates from filtered_cells
+        filtered_cells = filtered_cells.dropna(subset=['Lat', 'Long'])
+        
+        if not filtered_cells.empty:
+            # Calculate distances to each filtered cell
+            distances = filtered_cells.apply(
+                lambda w_row: calculate_distance(
+                    (source_lat, source_lon),
+                    (w_row['Lat'], w_row['Long'])
+                ),
+                axis=1
+            )
+            # Get the minimum distance and corresponding cell name
+            if not distances.empty:
+                min_distance_index = distances.idxmin()
+                min_distance = distances[min_distance_index]
+                clash_cell = filtered_cells.loc[min_distance_index, 'Cell Name']
+                return clash_cell, min_distance
+    
+    return None, None
