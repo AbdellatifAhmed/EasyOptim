@@ -35,7 +35,6 @@ with st.container():
     - **Function**: 
     1. It finds the `LNADJGNB` objects with unknown Target `cPlaneIpAddr` and prepares XML for it.
     2. It prepares a deletion XML for `LNADJGNB` objects with Targets farther than a predefined distance from the source.
-    - **Execution Time**: Based on `ADJS` and `Sites DB` it could reach up to *40 minutes*.
     """)
     col1, col2 = st.columns(2) 
     dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx"])
