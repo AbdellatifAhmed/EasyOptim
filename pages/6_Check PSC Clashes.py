@@ -38,6 +38,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=True):
     - **Dump File**: Limited to `xlsb`, Must contian`WCEL`, `ADJS`Tabs.
     - **Sites DB File**: Limited to `xlsx`, Must contain `NodeB Name`, `Cell Name`, `Lat`, `Long`, `DL Primary Scrambling Code`,`Downlink UARFCN` Columns.
     - **Scenario 1**: Check if the `PSC` of the `Target Cell` in `ADJS` is existing in a more closer cell.
+    - **Execution Time**: Based on ADJS and Sites DB it could reach up to 40minutes.
     """)
     cont1 = st.container()
     with cont1:
