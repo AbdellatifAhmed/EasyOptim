@@ -45,7 +45,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=True):
         file_Kml = col1.file_uploader("Sites DB File:", type=["xlsx"])
         col1_1,col1_2 = col1.columns(2)
         file_Dmp = col2.file_uploader("Param Dump File:", type=["xlsb"])
-        chk_Nbrs_Clashes = st.checkbox("Check Possible PSC Clash when a Target Neighbor has PSC and Closer than an already defined Neighbor",value=True)  
+        chk_Nbrs_Clashes = st.checkbox("**Scenario 1**: `Check if the PSC of the Target Cell in ADJS is existing in a more closer cell`",value=True)  
         btn_chkClash = st.button("Check PSC Possible Clashes")
 
         if btn_chkClash:
