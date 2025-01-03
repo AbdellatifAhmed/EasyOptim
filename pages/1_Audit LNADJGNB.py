@@ -28,6 +28,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 with st.container():
+    st.write("**Instructions:**")
+    st.markdown("""
+    - **Dump File**: Limited to `xlsb`, Must contian`WCEL`, `ADJS`Tabs.
+    - **Sites DB File**: Limited to `xlsx`, Must contain `NodeB Name`, `Cell Name`, `Lat`, `Long`, `DL Primary Scrambling Code`,`Downlink UARFCN` Columns.
+    - **Scenario 1**: Check if the `PSC` of the `Target Cell` in `ADJS` is existing in a more closer cell.
+    - **Execution Time**: Based on `ADJS` and `Sites DB` it could reach up to *40 minutes*.
+    """)
     col1, col2 = st.columns(2) 
     dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx", "txt"])
     dmp_file = col2.file_uploader("Select Parameters Dump file [Must contain LnAdjgNB tabe]", type=["xlsb", "xlsx"])
