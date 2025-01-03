@@ -36,7 +36,7 @@ with st.container():
     - **Execution Time**: Based on `ADJS` and `Sites DB` it could reach up to *40 minutes*.
     """)
     col1, col2 = st.columns(2) 
-    dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx", "txt"])
+    dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx"])
     dmp_file = col2.file_uploader("Select Parameters Dump file [Must contain LnAdjgNB tabe]", type=["xlsb", "xlsx"])
     col3, col4, col5, col6 =st.columns(4)
     number_input = col3.number_input("Delete Distance [Km]", min_value=0, max_value=30, value=6)
