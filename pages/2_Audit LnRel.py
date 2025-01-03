@@ -32,6 +32,14 @@ st.markdown(
 )
 
 with st.container():
+    st.write("**Instructions:**")
+    st.markdown("""
+    - **Dump File**: Limited to `xlsb,xlsx`, Must contian`LNCEL`, `LNREL` or `LNREL_`Tabs.
+    - **Sites DB File**: Limited to `xlsx, csv `, Must contain `NodeB ID`, `Lat`, `Long` Columns.
+    - **Perfroamcen Report**: it should be the report `RSLTE031` and it should be collected as *Whole Period* not *daily* or *Hourly*.
+    - **Function**: 
+        1. It prepare 
+    """)
     col1, col2,col3 = st.columns(3) 
     dB_file = col1.file_uploader("Sites DB File:", type=["csv", "xlsx", "txt"])
     dmp_file = col2.file_uploader("Parameters Dump File:", type=["xlsb", "xlsx"])
