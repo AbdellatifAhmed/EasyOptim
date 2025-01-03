@@ -39,7 +39,7 @@ with st.container():
     - **Perfroamcen Report**: it should be the report `RSLTE031` and it should be collected as *Whole Period* not *daily* or *Hourly*.
     - **Function**: 
         1. Tool Just provide you back with the Same report after adding to it the distance between source and Target.
-        2. Function under development to suggest an `cellIndOffNeigh` or `handoverAllowed` changes based on the Target Cell Location comparing to source.
+        2. Function under development to suggest a `cellIndOffNeigh` or `handoverAllowed` changes based on the Target Cell Location comparing to source.
     """)
     col1, col2,col3 = st.columns(3) 
     dB_file = col1.file_uploader("Sites DB File:", type=["csv", "xlsx", "txt"])
