@@ -30,8 +30,9 @@ st.markdown(
 with st.container():
     st.write("**Instructions:**")
     st.markdown("""
+    - **Dump File**: Limited to `xlsb,xlsx`, Must contian`LNCEL`, `LNADJGNB`Tabs.
     - **Sites DB File**: Limited to `xlsx, csv `, Must contain `NodeB ID`, `Lat`, `Long` Columns.
-    - **Scenario 1**: Check if the `PSC` of the `Target Cell` in `ADJS` is existing in a more closer cell.
+    - **Function**: It finds the LNADJGNB objects with unknow Target IP Address and assign it .
     - **Execution Time**: Based on `ADJS` and `Sites DB` it could reach up to *40 minutes*.
     """)
     col1, col2 = st.columns(2) 
