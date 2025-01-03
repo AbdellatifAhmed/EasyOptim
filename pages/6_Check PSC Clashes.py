@@ -33,6 +33,13 @@ st.markdown(
 )
 
 with st.expander("Upload/Update Dump & KML File",expanded=True):
+    st.write("**Instructions:**")
+    st.markdown("""
+    - **Technology**: Limited to `2G`, `3G`, `4G`, `5G`.
+    - **Logical_Condition1, Logical_Condition2**: Limited to `<`, `>`, `=`, `<=`, `>=`.
+    - **Indicator1, Indicator1**: must be same name in KPIs report related to the technology.
+    - Input KPIs reports must be in **CSV formate** `output report from Nokia Netact are with SemiColumn delimiter`.
+    """)
     cont1 = st.container()
     with cont1:
         col1,col2 = st.columns(2)
