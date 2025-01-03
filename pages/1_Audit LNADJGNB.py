@@ -32,7 +32,8 @@ with st.container():
     st.markdown("""
     - **Dump File**: Limited to `xlsb,xlsx`, Must contian`LNCEL`, `LNADJGNB`Tabs.
     - **Sites DB File**: Limited to `xlsx, csv `, Must contain `NodeB ID`, `Lat`, `Long` Columns.
-    - **Function**: It finds the LNADJGNB objects with unknow Target IP Address and assign it .
+    - **Function**: 
+                -It finds the LNADJGNB objects with unknow Target cPlaneIpAddr and prepare xml for it* .
     - **Execution Time**: Based on `ADJS` and `Sites DB` it could reach up to *40 minutes*.
     """)
     col1, col2 = st.columns(2) 
