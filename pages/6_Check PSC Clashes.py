@@ -31,7 +31,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-recent_dB = lataftaf.get_log()
+
 with st.expander("Upload/Update Dump & KML File",expanded=True):
     cont1 = st.container()
     with cont1:
@@ -49,7 +49,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=True):
                 if file_Kml:
                     if file_Dmp:
                         if chk_Nbrs_Clashes:
-                            output_table = lataftaf.checkPSC_Clash(file_Kml, file_Dmp)
+                            output_table = lataftaf.checkPSC_Nbrs_Clash(file_Kml, file_Dmp)
                             with open(psc_clash, "rb") as f:
                                 file_data = f.read()
                                 b64_file_data = base64.b64encode(file_data).decode()
