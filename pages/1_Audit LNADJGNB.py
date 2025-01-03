@@ -33,8 +33,8 @@ with st.container():
     - **Dump File**: Limited to `xlsb,xlsx`, Must contian`LNCEL`, `LNADJGNB`Tabs.
     - **Sites DB File**: Limited to `xlsx, csv `, Must contain `NodeB ID`, `Lat`, `Long` Columns.
     - **Function**: 
-    1. It finds the `LNADJGNB` objects with unknown Target `cPlaneIpAddr` and prepares XML for it.
-    2. It prepares a deletion XML for `LNADJGNB` objects with Targets farther than a predefined distance from the source.
+        1. It finds the `LNADJGNB` objects with unknown Target `cPlaneIpAddr` and prepares XML for it.
+        2. It prepares a deletion XML for `LNADJGNB` objects with Targets farther than a predefined distance from the source.
     """)
     col1, col2 = st.columns(2) 
     dB_file = col1.file_uploader("Select Engineer Parameters File [Must contain NodeB ID,Lat, Long]", type=["csv", "xlsx"])
