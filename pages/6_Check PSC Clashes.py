@@ -37,8 +37,7 @@ with st.expander("Upload/Update Dump & KML File",expanded=True):
     st.markdown("""
     - **Dump File**: Limited to `xlsb`, Must contian`WCEL`, `ADJS`Tabs.
     - **Sites DB File**: Limited to `xlsx`, Must contain `NodeB Name`, `Cell Name`, `Lat`, `Long`, `DL Primary Scrambling Code`,`Downlink UARFCN` Columns.
-    - **Indicator1, Indicator1**: must be same name in KPIs report related to the technology.
-    - Input KPIs reports must be in **CSV formate** `output report from Nokia Netact are with SemiColumn delimiter`.
+    - **Scenario 1**: Check if the `PSC` of the `Target Cell` in `ADJS` is existing in a more closer cell.
     """)
     cont1 = st.container()
     with cont1:
