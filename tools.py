@@ -20,7 +20,6 @@ import ast
 from xml.dom import minidom
 from shapely.geometry import Polygon, Point
 
-
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
 nbrs_db = os.path.join(output_dir, 'estimated_Nbrs1.csv')
@@ -33,6 +32,7 @@ psc_clash = os.path.join(output_dir, 'Possible Clash Cases.xlsx')
 overshooters = os.path.join(output_dir, 'Overshooting Sectors.xlsx')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
+
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
     start_time = time.time()
     fileSitesDB_dF = Lnadjgnb_audit_form['fileSitesDB']
