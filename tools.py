@@ -18,6 +18,8 @@ from scipy.spatial import KDTree
 import subprocess
 import ast
 from xml.dom import minidom
+from shapely.geometry import Polygon, Point
+
 
 output_dir = os.path.join(os.getcwd(), 'OutputFiles')
 sites_db = os.path.join(output_dir, 'sites_db.csv')
@@ -28,6 +30,7 @@ xml_objects = os.path.join(output_dir, 'XML Objects.xlsx')
 created_xml_link = os.path.join(output_dir, 'OutputXML.xml')
 xls_PRFILEs = os.path.join(output_dir, 'PRFILE.xlsx')
 psc_clash = os.path.join(output_dir, 'Possible Clash Cases.xlsx')
+overshooters = os.path.join(output_dir, 'Overshooting Sectors.xlsx')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 def audit_Lnadjgnb(Lnadjgnb_audit_form):
@@ -757,3 +760,161 @@ def calculate_shortest_distance(row, df_kml):
                 return clash_cell, min_distance
     
     return None, None
+
+def get_overshooters(tech, pd_report, KML_DB):
+    start_time = time.time()
+    if tech =="3G":
+        print("Selected to get overshooters for 3G Technology!")
+        df_propag_report = pd.read_excel(pd_report)
+        df_kml = pd.read_excel(KML_DB)
+        df_kml.columns = df_kml.columns.str.strip()
+        report_Nodes = df_propag_report.rename(columns={"WBTS ID": "NodeB Id"}).iloc[1:]
+        report_Nodes = report_Nodes['NodeB Id'].unique()
+        df_kml['NodeB Id'] = df_kml['NodeB']
+        selected_col = ['NodeB Id', 'Lat', 'Long']
+        df_sites = df_kml[selected_col].drop_duplicates()
+        coords = df_sites[['Lat', 'Long']].values
+        tree = KDTree(coords)
+        df_sites = df_sites.reset_index(drop=True)
+        find_neighbors_func = find_neighbors2(df_sites, coords, 10, tree,1000,report_Nodes)
+        df_sites['CloseNeighbors'] = df_sites.index.map(find_neighbors_func)
+        df_propag_report = df_propag_report.iloc[1:]
+        date_patterns = ['date', 'time','period']
+        date_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in date_patterns)]
+        patterns = ['rnc', 'site', 'wbts', 'nodeb', 'node b','wcel' ]
+        identity_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in patterns)]
+        pd_col_patterns = ['propagation_delay', 'prach_delay_average']
+        prop_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in pd_col_patterns)]
+        most_recent_data = max(df_propag_report[date_cols[0]].unique())
+        df_filtered = df_propag_report[df_propag_report[date_cols[0]] == most_recent_data]
+        needed_cols = identity_cols.copy()
+        pd_col = prop_cols[0]
+        needed_cols.append(pd_col)
+
+        df_filtered = df_filtered[needed_cols]
+        df_filtered['Lat'] = df_filtered['WCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Lat'])))
+        df_filtered['Long'] = df_filtered['WCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Long'])))
+        df_filtered['Azimuth'] = df_filtered['WCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Bore'])))
+        df_filtered['Azimuth'] = df_filtered['Azimuth'].apply(pd.to_numeric , errors='coerce')
+        df_filtered['Propagation_polygon'] = df_filtered.apply(lambda row: calculate_polygon(row['Lat'],row['Long'],row['Azimuth'],row[pd_col],Antenna_Beamwidth=50),axis=1)
+        df_filtered['CloseNeighbors'] = df_filtered['WBTS ID'].map(dict(zip(df_sites['NodeB Id'],df_sites['CloseNeighbors'])))
+        df_filtered['Overshooted_Sites'] = df_filtered.apply(lambda row: count_points_inside_polygon(row,df_sites,'WCEL name'),axis=1)
+        non_existing_cells = df_filtered[df_filtered['Lat'].isna()]
+        df_filtered= df_filtered[df_filtered['Overshooted_Sites']>0]
+        df_filtered = df_filtered.drop(columns=['Propagation_polygon', 'CloseNeighbors'])
+        
+        with pd.ExcelWriter(overshooters, engine='openpyxl') as writer:
+            df_filtered.to_excel(writer, sheet_name='3G_Overshooting Sectors', index=False)
+            non_existing_cells.to_excel(writer,sheet_name='Missing 3G Cells in Site DB', index=False) 
+        end_time =time.time()
+        duration = str(round((end_time - start_time),0))+" Seconds"
+        return duration
+
+    if tech =="4G":
+        print("Selected to get overshooters for LTE Technology!")
+        df_propag_report = pd.read_excel(pd_report)
+        report_Nodes = df_propag_report.iloc[1:]
+        report_Nodes['NodeB Id'] = report_Nodes['LNBTS name'].str.extract(r'(\d+)-').astype(float)
+        report_Nodes= report_Nodes['NodeB Id'].unique()
+        df_kml = pd.read_excel(KML_DB)
+        df_kml.columns = df_kml.columns.str.strip()
+        df_kml['NodeB Id'] = df_kml['eNodeB ID']
+        selected_col = ['NodeB Id', 'Lat', 'Long']
+        df_sites = df_kml[selected_col].drop_duplicates()
+        coords = df_sites[['Lat', 'Long']].values
+        tree = KDTree(coords)
+        df_sites = df_sites.reset_index(drop=True)
+        find_neighbors_func = find_neighbors2(df_sites, coords, 10, tree,1000,report_Nodes)
+        df_sites['CloseNeighbors'] = df_sites.index.map(find_neighbors_func)
+        df_propag_report = df_propag_report.iloc[1:]
+        date_patterns = ['date', 'time','period']
+        date_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in date_patterns)]
+        patterns = ['mrbts name', 'lnbts name', 'lncel name' ]
+        identity_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in patterns)]
+        
+        most_recent_data = max(df_propag_report[date_cols[0]].unique())
+        df_filtered = df_propag_report[df_propag_report[date_cols[0]] == most_recent_data]
+        needed_cols = identity_cols.copy()
+        pd_col_patterns = ['avg ue distance']
+        prop_cols = [col for col in df_propag_report.columns if any(pattern in col.lower() for pattern in pd_col_patterns)]
+        pd_col = prop_cols[0]
+        # print(pd_col)
+        needed_cols.append(pd_col)
+        df_filtered = df_filtered[needed_cols]
+        df_filtered[pd_col] = df_filtered[pd_col]*1000
+        df_filtered['LNBTS ID'] = df_filtered['LNBTS name'].str.extract(r'(\d+)-').astype(float)
+        df_filtered['Lat'] = df_filtered['LNCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Lat'])))
+        df_filtered['Long'] = df_filtered['LNCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Long'])))
+        df_filtered['Azimuth'] = df_filtered['LNCEL name'].map(dict(zip(df_kml['Cell Name'],df_kml['Azimuth'])))
+        df_filtered['Azimuth'] = df_filtered['Azimuth'].apply(pd.to_numeric , errors='coerce')
+        df_filtered['Propagation_polygon'] = df_filtered.apply(lambda row: calculate_polygon(row['Lat'],row['Long'],row['Azimuth'],row[pd_col],Antenna_Beamwidth=50),axis=1)
+        df_filtered['CloseNeighbors'] = df_filtered['LNBTS ID'].map(dict(zip(df_sites['NodeB Id'],df_sites['CloseNeighbors'])))
+        df_filtered['Overshooted_Sites'] = df_filtered.apply(lambda row: count_points_inside_polygon(row,df_sites,'LNCEL name'),axis=1)
+        non_existing_cells = df_filtered[df_filtered['Lat'].isna()]
+        df_filtered= df_filtered[df_filtered['Overshooted_Sites']>0]
+        df_filtered = df_filtered.drop(columns=['Propagation_polygon', 'CloseNeighbors'])
+
+        with pd.ExcelWriter(overshooters, engine='openpyxl') as writer:
+            df_filtered.to_excel(writer, sheet_name='4G_Overshooting Sectors', index=False)
+            non_existing_cells.to_excel(writer,sheet_name='Missing 4G Cells in Site DB', index=False)
+        end_time =time.time()
+        duration = str(round((end_time - start_time),0))+" Seconds"
+        return duration
+
+def count_points_inside_polygon(row, df2,cell_name):
+    polygon_points = row['Propagation_polygon']
+    
+    count = 0
+    checked_Nbrs = 0
+    existing_Nbrs = 0
+    
+    # if pd.isna(row['AllNeighbors']):
+    #     return count
+    
+    neighbors_list = str(row['CloseNeighbors']).replace("'", "").replace("[", "").replace("]", "").replace(" ", "").split(',')
+    neighbors_list = [nbr.strip() for nbr in neighbors_list if nbr]
+    # print(neighbors_list)
+    existing_Nbrs = len(neighbors_list)
+
+    # df2_filtered = df2[df2['NodeB Id'].isin(neighbors_list)]
+    df2_filtered = df2[df2['NodeB Id'].astype(str).isin(neighbors_list)]
+    checked_Nbrs = len(df2_filtered)
+    for index, site_row in df2_filtered.iterrows():
+        site_point = (site_row['Lat'], site_row['Long'])
+        if is_point_inside_polygon(polygon_points, site_point):
+            count += 1
+    # print(checked_Nbrs,":",existing_Nbrs,":",row[cell_name],":",count)
+    return count
+    
+def is_point_inside_polygon(polygon_points, point):
+    polygon = Polygon(polygon_points)
+    point = Point(point)
+    return polygon.contains(point)
+
+def find_neighbors2(sites_db, coords, distance_threshold, tree, count, nodes):
+    # Convert `nodes` to a set for efficient lookups
+    nodes_set = set(nodes)
+
+    def _find(site_idx):
+        # Get the NodeB Id for the current site
+        nodeb_id = sites_db.iloc[site_idx]['NodeB Id']
+        
+        # Check if the current NodeB Id is in the nodes set
+        if nodeb_id in nodes_set:
+            site_coord = coords[site_idx].reshape(1, -1)
+            distances, indices = tree.query(
+                site_coord, k=len(coords), distance_upper_bound=distance_threshold / 111
+            )  # Convert km to degrees approx.
+            
+            valid_indices = [
+                i for i, d in zip(indices[0], distances[0])
+                if i != site_idx and i < len(coords) and d < float('inf')
+            ]
+            closest_indices = sorted(
+                valid_indices, key=lambda i: distances[0][indices[0].tolist().index(i)]
+            )[:count]
+            return sites_db.iloc[closest_indices]['NodeB Id'].tolist()
+        else:
+            return "Not Needed"
+
+    return _find
