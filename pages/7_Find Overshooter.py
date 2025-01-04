@@ -75,3 +75,25 @@ with st.expander("Find Overshooters Tool",expanded=True):
                     st.error("Missing Sites DB")
             else:
                 st.error("Missing Propagation delay KPIs report!")
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        padding: 10px 0;
+        text-align: left;
+        font-size: 16px;
+        border-top: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="footer">
+        The Tool developed by Abdellatif Ahmed (abdellatif.ahmed@nokia.com)
+        
+    </div>
+    
+    """,
+    unsafe_allow_html=True,
+)
