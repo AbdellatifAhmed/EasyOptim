@@ -48,6 +48,9 @@ with st.expander("Find Overshooters Tool",expanded=True):
         - **3G Sites DB File**: Limited to `xlsx`, the columns `NodeB`,`Lat`,`Long` must exist.
         - **4G KPIs Report**: it must contain `LNCEL name`, `LNBTS name` and PRACH counter must contain the text `avg ue distance`.
         - **4G Sites DB File**: Limited to `xlsx`, the columns `eNodeB ID`,`Lat`,`Long` must exist.
+         - **Function**: 
+            1. It finds the `LNADJGNB` objects with unknown Target `cPlaneIpAddr` and prepares XML for it.
+            2. It prepares a deletion XML for `LNADJGNB` objects with Targets farther than a predefined distance from the source.
         - **Functions**: 
                     1. Tool identify the closest sites within a 20Km circle.
                     2. Tool assume a coverage Arc of beamwidth 50 degrees and length equal to the Average propagation distance of the cell.
