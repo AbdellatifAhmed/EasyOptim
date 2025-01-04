@@ -53,6 +53,7 @@ with st.expander("Find Overshooters Tool",expanded=True):
             2. Tool assume a coverage Arc of beamwidth `50degrees` and length equal to the Average propagation distance of the cell.
             3. Tool counts the sites that inside the coverage arc mentioned in point .
             4. The more sites inside the Coverage area, the more overshooting the cell introduce.
+            5. If given Propagation report contains multiple values for the cell, only the Most recent value is considered.
 
         """)
         col1,col2,col3 = st.columns(3)
