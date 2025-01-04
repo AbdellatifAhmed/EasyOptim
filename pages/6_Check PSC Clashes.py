@@ -64,4 +64,25 @@ with st.expander("Upload/Update Dump & KML File",expanded=True):
                             st.markdown(download_link, unsafe_allow_html=True)
                             st.write("Execution Done Successfully in: ", output_table)
                         
-            
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        padding: 10px 0;
+        text-align: left;
+        font-size: 16px;
+        border-top: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="footer">
+        The Tool developed by Abdellatif Ahmed (abdellatif.ahmed@nokia.com)
+        
+    </div>
+    
+    """,
+    unsafe_allow_html=True,
+)            
