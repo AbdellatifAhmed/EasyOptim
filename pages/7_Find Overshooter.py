@@ -50,7 +50,7 @@ with st.expander("Find Overshooters Tool",expanded=True):
         - **4G Sites DB File**: Limited to `xlsx`, the columns `eNodeB ID`,`Lat`,`Long` must exist.
          - **Function**: 
             1. Tool identify the closest sites within a `20Km` circle.
-            2. Tool assume a coverage Arc of beamwidth `50` degrees and length equal to the Average propagation distance of the cell.
+            2. Tool assume a coverage Arc of beamwidth `50degrees` and length equal to the Average propagation distance of the cell.
             3. Tool counts the sites that inside the coverage arc mentioned in point .
             4. The more sites inside the Coverage area, the more overshooting the cell introduce.
 
