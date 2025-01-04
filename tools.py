@@ -894,18 +894,15 @@ def is_point_inside_polygon(polygon_points, point):
 def find_neighbors2(sites_db, coords, distance_threshold, tree, count, nodes):
     # Convert `nodes` to a set for efficient lookups
     nodes_set = set(nodes)
-
     def _find(site_idx):
         # Get the NodeB Id for the current site
         nodeb_id = sites_db.iloc[site_idx]['NodeB Id']
-        
         # Check if the current NodeB Id is in the nodes set
         if nodeb_id in nodes_set:
             site_coord = coords[site_idx].reshape(1, -1)
             distances, indices = tree.query(
                 site_coord, k=len(coords), distance_upper_bound=distance_threshold / 111
             )  # Convert km to degrees approx.
-            
             valid_indices = [
                 i for i, d in zip(indices[0], distances[0])
                 if i != site_idx and i < len(coords) and d < float('inf')
@@ -916,5 +913,44 @@ def find_neighbors2(sites_db, coords, distance_threshold, tree, count, nodes):
             return sites_db.iloc[closest_indices]['NodeB Id'].tolist()
         else:
             return "Not Needed"
-
     return _find
+
+def calculate_polygon(latitude, longitude, azimuth, radius_meters=100,Antenna_Beamwidth =30):
+    """
+    Calculate the polygon for a sector based on latitude, longitude, azimuth, and radius in meters.
+
+    Args:
+        latitude (float): Latitude of the center point.
+        longitude (float): Longitude of the center point.
+        azimuth (float): Direction of the sector in degrees.
+        radius_meters (float): Radius of the sector in meters (default is 100 meters).
+
+    Returns:
+        list: A list of [latitude, longitude] pairs defining the sector polygon.
+    """
+    if pd.isnull(latitude) or pd.isnull(longitude) or pd.isnull(azimuth) or pd.isnull(radius_meters):
+        return None 
+    # Earth's radius in meters
+    earth_radius = 6378137  # WGS84
+
+    # Convert azimuth and width to radians
+    azimuth_rad = math.radians(azimuth)
+    width = math.radians(Antenna_Beamwidth)  # Sector width of ±15 degrees (30 degrees total)
+
+    # Conversion factors for meters to latitude and longitude degrees
+    radius_lat = radius_meters / earth_radius  # Convert radius to radians latitude
+    radius_lon = radius_meters / (earth_radius * math.cos(math.radians(latitude)))  # Adjust for longitude compression
+
+    # First corner of the triangle
+    lat1 = latitude + math.degrees(radius_lat * math.cos(azimuth_rad - width))
+    lon1 = longitude + math.degrees(radius_lon * math.sin(azimuth_rad - width))
+
+    # Second corner (main azimuth direction)
+    lat2 = latitude + math.degrees(radius_lat * math.cos(azimuth_rad))
+    lon2 = longitude + math.degrees(radius_lon * math.sin(azimuth_rad))
+
+    # Third corner of the triangle
+    lat3 = latitude + math.degrees(radius_lat * math.cos(azimuth_rad + width))
+    lon3 = longitude + math.degrees(radius_lon * math.sin(azimuth_rad + width))
+
+    return [[latitude, longitude], [lat1, lon1], [lat2, lon2], [lat3, lon3], [latitude, longitude]]
