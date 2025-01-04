@@ -190,4 +190,25 @@ with st.expander("Select the KPIs Reports for each Technology",expanded=True):
                     download_link = f'<a href="data:application/octet-stream;base64,{b64_file_data}" download="{os.path.basename(wcl_5G)}">Click to download 5G WCL File {os.path.basename(wcl_5G)}</a>'
                 st.markdown(download_link, unsafe_allow_html=True)
         
-
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        padding: 10px 0;
+        text-align: left;
+        font-size: 16px;
+        border-top: 2px solid #e0e0e0;
+    }
+    </style>
+    <div class="footer">
+        The Tool developed by Abdellatif Ahmed (abdellatif.ahmed@nokia.com)
+        
+    </div>
+    
+    """,
+    unsafe_allow_html=True,
+)
