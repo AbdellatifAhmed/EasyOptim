@@ -489,9 +489,9 @@ def valide_make_XML(selected_Object, changes_csv,action):
                 i= 0
                 for col in mandatory_columns:
                     if i < len(mandatory_columns)-1:
-                        dist_name = dist_name + col + "-" + row[col].astype(str) + "/"
+                        dist_name = dist_name + col + "-" + str(row[col]) + "/"
                     else:
-                        dist_name = dist_name + col + "-" + row[col].astype(str)
+                        dist_name = dist_name + col + "-" + str(row[col])
                     i = i+1
                 if action == "update" or action == "create":
                     managed_object = ET.SubElement(cm_data,"managedObject",class_=selected_Object,distName=dist_name,version="xL21A_2012_003",operation=action)
