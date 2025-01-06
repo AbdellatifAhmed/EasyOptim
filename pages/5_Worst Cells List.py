@@ -149,7 +149,7 @@ with st.expander("Select the KPIs Reports for each Technology",expanded=True):
     col2G,col3G,col4G,col5G = st.columns(4)
     files_2G = col2G.file_uploader("Select 2G KPIs Reports:", type=["csv"],accept_multiple_files=True)
     files_3G = col3G.file_uploader("Select 3G KPIs Reports:", type=["csv"],accept_multiple_files=True) 
-    files_4G = col4G.file_uploader("Select 4G KPIs Reports:", type=["csv,XLSX"],accept_multiple_files=True) 
+    files_4G = col4G.file_uploader("Select 4G KPIs Reports:", type=["csv"],accept_multiple_files=True) 
     files_5G = col5G.file_uploader("Select 5G KPIs Reports:", type=["csv"],accept_multiple_files=True)
 
     btn_initiate_Wcl = st.button("Start", key="btn_initiate_Wcl") 
