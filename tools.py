@@ -99,15 +99,12 @@ def make_Update_XML(tbl_DF, parameter,output_File):
         managed_object = ET.SubElement(cm_data,"managedObject",class_="LNADJGNB",distName=dist_name,version="xL21A_2012_003",operation="update")
         ET.SubElement(managed_object, "p", name=parameter).text = row[parameter]
     
-    xml_data = ET.tostring(root, encoding="utf-8", method="xml")
+    
     xml_data = ET.tostring(root, encoding="utf-8", method="xml")
     dom = minidom.parseString(xml_data)  # Parse the XML string
     pretty_xml = dom.toprettyxml(indent="  ")  # Add indentation and line breaks
     with open(output_File, "w", encoding="utf-8") as xmlfile:
                 xmlfile.write(pretty_xml)
-    
-    # with open(output_File, "wb") as xmlfile:
-    #     xmlfile.write(xml_data)
 
 def make_delete_XML(tbl_DF, output_File):
     now = datetime.now()
@@ -123,9 +120,11 @@ def make_delete_XML(tbl_DF, output_File):
             version="xL21A_2012_003", operation="delete"
         )
     xml_data = ET.tostring(root, encoding="utf-8", method="xml")
-    
-    with open(output_File, "wb") as xmlfile:
-        xmlfile.write(xml_data)
+    dom = minidom.parseString(xml_data)  # Parse the XML string
+    pretty_xml = dom.toprettyxml(indent="  ")  # Add indentation and line breaks
+    with open(output_File, "w", encoding="utf-8") as xmlfile:
+                xmlfile.write(pretty_xml)
+
 
 def calculate_distance(coord1, coord2):
     return geodesic(coord1, coord2).kilometers
