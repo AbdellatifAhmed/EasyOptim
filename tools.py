@@ -548,7 +548,6 @@ def audit_prfiles(files):
         return "PRFILEs Preparation Done Successfully!"
     except Exception as e:
         return e
-
 def get_wcl(df_criteria,wcl_KPIs,tech,thrshld_days):
     start_time = time.time()
     WCL_file = os.path.join(output_dir, tech +'_WCL.xlsx')
@@ -557,7 +556,7 @@ def get_wcl(df_criteria,wcl_KPIs,tech,thrshld_days):
         WCL_Criteria_url = os.path.join(output_dir, 'WCL_Criteria.xlsx')
         identity_columns = []
         date_columns = []
-        patterns = [ 'rnc', 'site', 'wbts', 'nodeb', 'node b','wcel' ]
+        patterns = [ 'site', 'wbts', 'nodeb', 'node b','wcel', 'lncel', 'lnbts' ]
         date_patterns = ['date', 'time','period']
         date_col = ''
         i=0
