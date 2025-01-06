@@ -562,8 +562,11 @@ def get_wcl(df_criteria,wcl_KPIs,tech,thrshld_days):
         i=0
         kpis_csvs = []
         for kpis_file in wcl_KPIs:
-            kpis_df = pd.read_csv(kpis_file,delimiter=';')
-            kpis_csvs.append(kpis_df)            
+            try:
+                kpis_df = pd.read_csv(kpis_file, delimiter=';')
+                kpis_csvs.append(kpis_df)
+            except Exception as e:
+                print(f"Error reading file {kpis_file}: {e}")          
             identity_cols = [col for col in kpis_df.columns if any(pattern in col.lower() for pattern in patterns)]
             # identity_cols = [value for value in identity_cols if 'asiacell' not in value.lower()]
             date_cols = [col for col in kpis_df.columns if any(pattern in col.lower() for pattern in date_patterns)]
