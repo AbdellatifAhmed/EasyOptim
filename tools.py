@@ -497,7 +497,7 @@ def valide_make_XML(selected_Object, changes_csv,action):
                     managed_object = ET.SubElement(cm_data,"managedObject",class_=selected_Object,distName=dist_name,version="xL21A_2012_003",operation=action)
                     for parameter in df_changes_csv.columns:
                         if parameter not in mandatory_columns:
-                            ET.SubElement(managed_object, "p", name=parameter).text = row[parameter].astype(str)
+                            ET.SubElement(managed_object, "p", name=parameter).text = str(row[parameter])
                 elif action == "delete":
                     ET.SubElement(cm_data, "managedObject", class_=selected_Object, distName=dist_name,version="xL21A_2012_003", operation=action)
                 else:
