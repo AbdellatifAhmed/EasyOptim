@@ -499,12 +499,12 @@ def valide_make_XML(selected_Object, changes_csv,action):
                         dist_name = dist_name + col + "-" + str(row[col])
                     i = i+1
                 if action == "update" or action == "create":
-                    managed_object = ET.SubElement(cm_data,"managedObject","class"=selected_Object,distName=dist_name,version="xL21A_2012_003",operation=action)
+                    managed_object = ET.SubElement(cm_data,"managedObject",class=selected_Object,distName=dist_name,version="xL21A_2012_003",operation=action)
                     for parameter in df_changes_csv.columns:
                         if parameter not in mandatory_columns:
                             ET.SubElement(managed_object, "p", name=parameter).text = str(row[parameter])
                 elif action == "delete":
-                    ET.SubElement(cm_data, "managedObject", "class"=selected_Object, distName=dist_name,version="xL21A_2012_003", operation=action)
+                    ET.SubElement(cm_data, "managedObject", class=selected_Object, distName=dist_name,version="xL21A_2012_003", operation=action)
                 else:
                     return "Error Un-Identified operation!"
         
