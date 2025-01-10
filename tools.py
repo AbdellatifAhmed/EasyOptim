@@ -508,24 +508,15 @@ def valide_make_XML(selected_Object, changes_csv,action):
                 # else:
                 #     return "Error Un-Identified operation!"
                 if action == "update" or action == "create":
-                    managed_object = ET.SubElement(
-                                        cm_data,
-                                        "managedObject",
-                                        **{"class": selected_Object, "distName": dist_name, "version": "xL21A_2012_003", "operation": action}
-                                    )
+                    managed_object = ET.SubElement(cm_data,"managedObject",**{"class": selected_Object, "distName": dist_name, "version": "xL21A_2012_003", "operation": action})
                     for parameter in df_changes_csv.columns:
                         if parameter not in mandatory_columns:
                             ET.SubElement(managed_object, "p", name=parameter).text = str(row[parameter])
                 elif action == "delete":
-                    ET.SubElement(
-                        cm_data,
-                        "managedObject",
-                        **{"class": selected_Object, "distName": dist_name, "version": "xL21A_2012_003", "operation": action}
-                    )
+                    ET.SubElement(cm_data,"managedObject",**{"class": selected_Object, "distName": dist_name, "version": "xL21A_2012_003", "operation": action})
                 else:
                     return "Error Un-Identified operation!"
-        
-            # xml_data = ET.tostring(root, encoding="utf-8", method="xml")
+
             xml_data = ET.tostring(root, encoding="utf-8", method="xml")
             dom = minidom.parseString(xml_data)  # Parse the XML string
             pretty_xml = dom.toprettyxml(indent="  ")  # Add indentation and line breaks
