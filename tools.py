@@ -702,6 +702,7 @@ def checkPSC_Nbrs_Clash(kmlFile,dumpFile):
     df_wcel = pd.read_excel(xls, sheet_name='WCEL', header=1)
     df_wcel.columns = df_wcel.columns.str.strip() 
     df_wcel['cell_Lkup'] = df_wcel['RNC'].astype(str) + '_' + df_wcel['WBTS'].astype(str) + '_' + df_wcel['WCEL'].astype(str)
+    df_wcel['cell_Lkup2'] = df_wcel['RNC'].astype(str) + '_' + df_wcel['WCEL'].astype(str)
     df_wcel['Sector ID'] = df_wcel.apply(lambda row: (str(row['WBTS']) +'_' + str(row['name'])[-2:][:1]), axis=1)
     df_wcel['Site Latitude'] = df_wcel['Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
     df_wcel['Site Longitude'] = df_wcel['Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
@@ -716,7 +717,9 @@ def checkPSC_Nbrs_Clash(kmlFile,dumpFile):
     df_adjs['Source Latitude'] = df_adjs['Source Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
     df_adjs['Source Longitude'] = df_adjs['Source Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
 
-    df_adjs['Target Cell Name'] = df_adjs['name']
+    df_adjs['Target Lkup'] = df_adjs['AdjsRNCid'].astype(str) + '_' + df_adjs['AdjsCI'].astype(str)
+    df_adjs['Target Cell Name'] = df_adjs['Target Lkup'].map(dict(zip(df_wcel['cell_Lkup2'],df_wcel['name'])))
+    # df_adjs['Target Cell Name'] = df_adjs['name']
     df_adjs['Target Sector ID'] = df_adjs.apply(lambda row: (str(row['name'])[:4] +'_' + str(row['name'])[-2:][:1]), axis=1)
     df_adjs['Target PSC'] = df_adjs['AdjsScrCode']
     df_adjs['Target Latitude'] = df_adjs['Target Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
