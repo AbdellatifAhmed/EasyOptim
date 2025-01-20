@@ -740,7 +740,7 @@ def checkPSC_Nbrs_Clash(kmlFile,dumpFile):
     df_output_possible_clashes = df_output_possible_clashes [df_output_possible_clashes ['Possible Clash Cell']!= df_output_possible_clashes ['Target Cell Name']]
     
     with pd.ExcelWriter(psc_clash, engine='openpyxl') as writer:
-        df_output_possible_clashes.to_excel(writer, sheet_name='Possible Clashes', index=False)
+        df_output_possible_clashes.to_excel(writer, sheet_name='Possible Clashes1', index=False)
     
     end_time =time.time()
     duration = str(round((end_time - start_time),0))+" Seconds"
