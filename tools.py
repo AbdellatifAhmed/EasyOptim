@@ -720,7 +720,7 @@ def checkPSC_Nbrs_Clash(kmlFile,dumpFile):
     df_adjs['Target Lkup'] = df_adjs['AdjsRNCid'].astype(str) + '_' + df_adjs['AdjsCI'].astype(str)
     df_adjs['Target Cell Name'] = df_adjs['Target Lkup'].map(dict(zip(df_wcel['cell_Lkup2'],df_wcel['name'])))
     # df_adjs['Target Cell Name'] = df_adjs['name']
-    df_adjs['Target Sector ID'] = df_adjs.apply(lambda row: (str(row['name'])[:4] +'_' + str(row['name'])[-2:][:1]), axis=1)
+    df_adjs['Target Sector ID'] = df_adjs.apply(lambda row: (str(row['Target Cell Name'])[:4] +'_' + str(row['Target Cell Name'])[-2:][:1]), axis=1)
     df_adjs['Target PSC'] = df_adjs['AdjsScrCode']
     df_adjs['Target Latitude'] = df_adjs['Target Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Lat'])))
     df_adjs['Target Longitude'] = df_adjs['Target Sector ID'].map(dict(zip(df_kml['Sector_ID'],df_kml['Long'])))
