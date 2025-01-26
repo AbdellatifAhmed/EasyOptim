@@ -231,6 +231,11 @@ def clean_Sites_db(sites_df,Is_Update_Nbrs,dB_file_name):
     sites_df.columns = sites_df.columns.str.strip()
     sites_df['NodeB Id'] = sites_df['NodeB Name'].apply(lambda x: str(x).split('-')[0])
     sites_df['Sector_ID'] = sites_df.apply(lambda row: (str(row['NodeB Id']) +'_' + str(row['Cell Name'])[-2:][:1]), axis=1)
+    sites_df['Lat']  = pd.to_numeric(sites_df['Lat'] , errors='coerce')
+    sites_df['Long']  = pd.to_numeric(sites_df['Long'] , errors='coerce')
+    sites_df['Bore']  = pd.to_numeric(sites_df['Bore'] , errors='coerce')
+    required_columns = ['Long', 'Lat', 'Bore']
+    sites_df = sites_df.dropna(subset=required_columns)
     sites_df["polygon"] = sites_df.apply(lambda row: calculate_sector_polygon(row["Lat"], row["Long"], row["Bore"]), axis=1)
     sites_df["Label"] = sites_df["polygon"].apply(lambda x: x[2])
     sites_df["coordinates"] = sites_df.apply(lambda row: get_coordinate(row["Long"], row["Lat"]), axis=1)
