@@ -185,8 +185,9 @@ def audit_Lnrel(Lnrel_audit_form):
     lnrel_Performance_DF['cellIndOffNeigh'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['cellIndOffNeigh'])))
     lnrel_Performance_DF['handoverAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['handoverAllowed'])))
     lnrel_Performance_DF['removeAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['removeAllowed'])))
-    
-    dic1 = fileSitesDB_dF['NodeB','Long', 'Lat'].drop_duplicates
+
+    dict1_cols = ['NodeB','Long', 'Lat']
+    dic1 = fileSitesDB_dF[dict1_cols].drop_duplicates()
     dict_longitude = (dict(zip(dic1['NodeB'], dic1['Long'])))
     dict_latitude = (dict(zip(dic1['NodeB'], dic1['Lat'])))
 
