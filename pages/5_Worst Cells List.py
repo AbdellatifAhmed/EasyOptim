@@ -119,6 +119,7 @@ with st.expander("Specify or Add KPIs/Thresholds for Worst Cells Criteria", expa
                 )
 
     if btn_uploadCriteria:
+        print("Test1:")
         if file_criteria is not None:
             try:
                 if file_criteria.name.endswith(".csv"):
