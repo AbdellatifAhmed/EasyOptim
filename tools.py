@@ -186,11 +186,10 @@ def audit_Lnrel(Lnrel_audit_form):
     lnrel_Performance_DF['handoverAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['handoverAllowed'])))
     lnrel_Performance_DF['removeAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['removeAllowed'])))
     
-    dict_longitude = (dict(zip(fileSitesDB_dF['NodeB'], fileSitesDB_dF['Long'])))
-    dict_latitude = (dict(zip(fileSitesDB_dF['NodeB'], fileSitesDB_dF['Lat'])))
-    duplicate_keys = [key for key, count in Counter(dict_longitude.keys()).items() if count > 1]
-    dict_longitude = {k: v for k, v in dict_longitude.items() if k not in duplicate_keys}
-    dict_latitude = {k: v for k, v in dict_latitude.items() if k not in duplicate_keys}
+    dic1 = fileSitesDB_dF['NodeB','Long', 'Lat'].drop_duplicates
+    dict_longitude = (dict(zip(dic1['NodeB'], dic1['Long'])))
+    dict_latitude = (dict(zip(dic1['NodeB'], dic1['Lat'])))
+
     lnrel_Performance_DF['Source Longitude'] = lnrel_Performance_DF['LNBTS'].map(dict_longitude)
     lnrel_Performance_DF['Source Latitude'] = lnrel_Performance_DF['LNBTS'].map(dict_latitude)
     lnrel_Performance_DF['Target Longitude'] = lnrel_Performance_DF['Target eNB'].map(dict_longitude)
