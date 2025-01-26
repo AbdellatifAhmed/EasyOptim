@@ -85,11 +85,12 @@ with st.expander("Upload KPIs & Performance Reports",expanded=st.session_state.e
 
 
 if btn_Kml:
+    print("Test1:")
     if file_Kml is not None:
         try:
             file_Kml_Name = file_Kml.name
             # Load and clean the data
-            print("Test1:",file_Kml_Name)
+            print("Test2:",file_Kml_Name)
             df_Kml = pd.read_csv(file_Kml, engine='python', encoding='Windows-1252')
             df_Kml = lataftaf.clean_Sites_db(df_Kml,Is_Update_Nbrs,file_Kml_Name)
             df_Kml["coordinates"] = df_Kml["coordinates"].apply(lambda x: [float(x[0]), float(x[1])] if isinstance(x, (list, tuple)) else None)
