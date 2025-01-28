@@ -44,9 +44,9 @@ with st.expander("Find Overshooters Tool",expanded=True):
         st.write("**Instructions:**")
         st.markdown("""
         - **Technology**: Limited to `3G`, `4G`.
-        - **3G KPIs Report**: it must contain `WCEL name`, `WBTS ID` and PRACH counter must contain the text `opagation_delay` or `prach_delay_average`.
-        - **3G Sites DB File**: Limited to `xlsx`, the columns `NodeB`,`Lat`,`Long` must exist.
-        - **4G KPIs Report**: it must contain `LNCEL name`, `LNBTS name` and PRACH counter must contain the text `avg ue distance`.
+        - **3G KPIs Report**: it must contain `WCEL name`, `WBTS ID`,`Period` or `Date` and PRACH counter must contain the text `opagation_delay` or `prach_delay_average`.
+        - **3G Sites DB File**: Limited to `xlsx`, the columns `NodeB`,`Lat`,`Long`,`Bore` must exist.
+        - **4G KPIs Report**: it must contain `LNCEL name`, `LNBTS name`,`Period` or `Date` and PRACH counter must contain the text `avg ue distance`.
         - **4G Sites DB File**: Limited to `xlsx`, the columns `eNodeB ID`,`Lat`,`Long` must exist.
          - **Function**: 
             1. Tool identify the closest sites within a `20Km` circle.
