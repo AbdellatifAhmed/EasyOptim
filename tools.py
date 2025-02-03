@@ -188,6 +188,7 @@ def audit_Lnrel(Lnrel_audit_form):
 
     dict1_cols = ['NodeB','Long', 'Lat']
     dic1 = fileSitesDB_dF[dict1_cols].drop_duplicates()
+    dic1 = dic1[~dic1.index.duplicated(keep='first')]
     dict_longitude = (dict(zip(dic1['NodeB'], dic1['Long'])))
     dict_latitude = (dict(zip(dic1['NodeB'], dic1['Lat'])))
     dict_longitude = dict_longitude[~dict_longitude.index.duplicated(keep='first')]
