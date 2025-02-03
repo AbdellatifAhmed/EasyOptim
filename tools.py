@@ -190,7 +190,8 @@ def audit_Lnrel(Lnrel_audit_form):
     dic1 = fileSitesDB_dF[dict1_cols].drop_duplicates()
     dict_longitude = (dict(zip(dic1['NodeB'], dic1['Long'])))
     dict_latitude = (dict(zip(dic1['NodeB'], dic1['Lat'])))
-
+    dict_longitude = dict_longitude[~dict_longitude.index.duplicated(keep='first')]
+    dict_latitude = dict_latitude[~dict_latitude.index.duplicated(keep='first')]
     lnrel_Performance_DF['Source Longitude'] = lnrel_Performance_DF['LNBTS'].map(dict_longitude)
     lnrel_Performance_DF['Source Latitude'] = lnrel_Performance_DF['LNBTS'].map(dict_latitude)
     lnrel_Performance_DF['Target Longitude'] = lnrel_Performance_DF['Target eNB'].map(dict_longitude)
