@@ -151,15 +151,24 @@ def audit_Lnrel(Lnrel_audit_form):
     lnrel_Performance_DF['Source Sector ID'] = lnrel_Performance_DF['Adj Intra eNB HO PREP SR'].apply(pd.to_numeric , errors='coerce')
     lnrel_Performance_DF['Adj Intra eNB HO PREP SR'] = lnrel_Performance_DF['Adj Intra eNB HO PREP SR'].apply(pd.to_numeric , errors='coerce')
     lnrel_Performance_DF['Intra eNB HO prep att neigh'] = lnrel_Performance_DF['Intra eNB HO prep att neigh'].apply(pd.to_numeric , errors='coerce')
-    lnrel_Performance_DF['Adj Intra eNB HO SR'] = lnrel_Performance_DF['Adj Intra eNB HO SR'].apply(pd.to_numeric , errors='coerce')
-    lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell'] = lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell'].apply(pd.to_numeric , errors='coerce')
-    lnrel_Performance_DF['Intra eNB HO attempts'] = lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell']
-    lnrel_Performance_DF['Intra eNB HO Fails'] = lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell'].astype(float) * (100 - lnrel_Performance_DF['Adj Intra eNB HO SR'].astype(float))
+    # Intra eNB Prep Failures
+    lnrel_Performance_DF['Intra eNB HO Prep. Failures'] = lnrel_Performance_DF['Intra eNB HO prep att neigh'].astype(float) * (100 - lnrel_Performance_DF['Adj Intra eNB HO PREP SR'].astype(float))/100
+    
+    lnrel_Performance_DF['Adj Intra eNB HO SR'] = lnrel_Performance_DF['Adj Intra eNB HO PREP SR'].apply(pd.to_numeric , errors='coerce')
+    lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell'] = lnrel_Performance_DF['Intra eNB HO prep att neigh'].apply(pd.to_numeric , errors='coerce')
+    # Intra eNB Exec Failures
+    lnrel_Performance_DF['Intra eNB HO Exec. Failures'] = lnrel_Performance_DF['Intra eNB HO attempts per neighbor cell'].astype(float) * (100 - lnrel_Performance_DF['Adj Intra eNB HO SR'].astype(float))/100
+
+    lnrel_Performance_DF['Adj Inter eNB HO Prep SR'] = lnrel_Performance_DF['Adj Intra eNB HO PREP SR'].apply(pd.to_numeric , errors='coerce')
+    lnrel_Performance_DF['Inter eNB HO prep att neigh'] = lnrel_Performance_DF['Intra eNB HO prep att neigh'].apply(pd.to_numeric , errors='coerce')
+    # Inter eNB Prep Failures
+    lnrel_Performance_DF['Inter eNB HO Prep. Failures'] = lnrel_Performance_DF['Inter eNB HO prep att neigh'].astype(float) * (100 - lnrel_Performance_DF['Adj Inter eNB HO Prep SR'].astype(float))/100
 
     lnrel_Performance_DF['Number of Inter eNB Handover attempts per neighbor cell relationship'] = lnrel_Performance_DF['Number of Inter eNB Handover attempts per neighbor cell relationship'].apply(pd.to_numeric , errors='coerce')
-    lnrel_Performance_DF['Inter eNB HO attempts'] = lnrel_Performance_DF['Number of Inter eNB Handover attempts per neighbor cell relationship']
-    lnrel_Performance_DF['Inter eNB NB HO fail ratio'] = lnrel_Performance_DF['Inter eNB NB HO fail ratio'].apply(pd.to_numeric , errors='coerce')
-    lnrel_Performance_DF['Inter eNB HO Fails'] = lnrel_Performance_DF['Inter eNB HO attempts'].astype(float) * lnrel_Performance_DF['Inter eNB NB HO fail ratio'].astype(float)
+    lnrel_Performance_DF['Inter eNB HO Exec. attempts'] = lnrel_Performance_DF['Number of Inter eNB Handover attempts per neighbor cell relationship']
+    lnrel_Performance_DF['Inter eNB NB HO Exec. fail ratio'] = lnrel_Performance_DF['Inter eNB NB HO fail ratio'].apply(pd.to_numeric , errors='coerce')
+    # Inter eNB Exec Failures
+    lnrel_Performance_DF['Inter eNB HO Exec. Fails'] = lnrel_Performance_DF['Inter eNB HO attempts'].astype(float) * lnrel_Performance_DF['Inter eNB NB HO fail ratio'].astype(float)
 
     lnrel_Performance_DF['eci_id'] = lnrel_Performance_DF['eci_id'].apply(pd.to_numeric , errors='coerce')
     
@@ -176,8 +185,6 @@ def audit_Lnrel(Lnrel_audit_form):
     lnrel_Performance_DF['FirstTierNeighbors'] = lnrel_Performance_DF['FirstTierNeighbors'].fillna('').astype(str)
     lnrel_Performance_DF['Target Sector ID'] = lnrel_Performance_DF['Target Sector ID'].fillna('').astype(str)
 
-    
-    
     lnrel_Performance_DF['relation'] = lnrel_Performance_DF['LNBTS'].astype(str) + '_' + lnrel_Performance_DF['LNCEL'].astype(str) + '_' + lnrel_Performance_DF['Target eNB'].astype(str)+ '_' + lnrel_Performance_DF['Target Cell'].astype(str)
     fileParamatersDB_LNREL_DF['relation'] = fileParamatersDB_LNREL_DF['LNBTS'].astype(str) + '_' + fileParamatersDB_LNREL_DF['LNCEL'].astype(str) + '_' + fileParamatersDB_LNREL_DF['ecgiAdjEnbId'].apply(lambda x: str(int(x)) if pd.notnull(x) else '') + '_' + fileParamatersDB_LNREL_DF['ecgiLcrId'].apply(lambda x: str(int(x)) if pd.notnull(x) else '')
     
@@ -185,7 +192,9 @@ def audit_Lnrel(Lnrel_audit_form):
     lnrel_Performance_DF['cellIndOffNeigh'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['cellIndOffNeigh'])))
     lnrel_Performance_DF['handoverAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['handoverAllowed'])))
     lnrel_Performance_DF['removeAllowed'] = lnrel_Performance_DF['relation'].map(dict(zip(fileParamatersDB_LNREL_DF['relation'],fileParamatersDB_LNREL_DF['removeAllowed'])))
-
+    dict1_cols = ['NodeB','Long', 'Lat']
+    dic1 = fileSitesDB_dF[dict1_cols].drop_duplicates()
+ 
     fileSitesDB_dF_unique1 = fileSitesDB_dF[['NodeB', 'Long']].drop_duplicates(subset=['NodeB'])
     dict_longitude = dict(zip(fileSitesDB_dF_unique1['NodeB'], fileSitesDB_dF_unique1['Long']))
     fileSitesDB_dF_unique2 = fileSitesDB_dF[['NodeB', 'Lat']].drop_duplicates(subset=['NodeB'])
@@ -206,8 +215,7 @@ def audit_Lnrel(Lnrel_audit_form):
                 ), axis=1)
     lnrel_Performance_DF['Is_imp_Nbrs'] = lnrel_Performance_DF.apply(lambda r: 'Co-located' if r['Distance'] == 0 else ('yes' if r['Target Sector ID'] in r['FirstTierNeighbors'] else 'no'),axis=1)
     
-    out_columns = ['MRBTS','LNBTS','LNCEL','LNREL','Is_imp_Nbrs','Source Sector ID','Target Sector ID','Target eNB','Target Cell','Distance','cellIndOffNeigh','handoverAllowed','removeAllowed','Inter eNB HO attempts','Inter eNB HO Fails','Intra eNB HO attempts','Intra eNB HO Fails']
-    output_Table = lnrel_Performance_DF[out_columns]
+    output_Table = lnrel_Performance_DF
     # output_Table = lnrel_Performance_DF
     LNREL_Audit_output = os.path.join(output_dir, 'LNREL Audit.xlsx')
     with pd.ExcelWriter(LNREL_Audit_output, engine='openpyxl') as writer:
